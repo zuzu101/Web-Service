@@ -1,0 +1,88 @@
+/* Custom styles for the authentication page */
+:root {
+    --primary-color: #0d6efd; 
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-background: #ffffff;
+    --font-family: 'Inter', sans-serif;
+}
+
+.auth-body {
+    padding: 2rem 1rem;
+    min-height: 100vh;
+    font-family: var(--font-family);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-logo h1 {
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.login-logo .text-primary {
+    color: var(--primary-color) !important;
+}
+
+.card {
+    border-radius: 1rem; 
+    border: none;
+    width: 100%; 
+}
+
+.card-body {
+    border-radius: 1rem;
+    padding: 2.5rem; 
+}
+
+.form-control {
+    height: calc(3.5rem + 2px); 
+    line-height: 1.25;
+    padding: 1rem;
+    border-radius: 0.5rem; 
+}
+
+.form-floating > label {
+    padding: 1rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    transform: scale(0.85) translateY(-0.9rem) translateX(0.15rem);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+
+@media (max-width: 767.98px) {
+    .card-body {
+        padding: 2rem 1.5rem; 
+    }
+
+    .login-logo h1 {
+        font-size: 1.75rem; 
+    }
+
+    .form-control {
+        height: calc(3.2rem + 2px); 
+    }
+}

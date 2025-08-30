@@ -1,0 +1,9 @@
+/* Global overrides for admin UI */
+
+/* Make Select2 rendered text and search input visible */
+.select2-container--default .select2-selection--single .select2-selection__rendered,
+.select2-selection__rendered,
+.select2-container .select2-selection--single {
+  background-color: #fff ;
+  border: 1px solid #ced4da ;
+}

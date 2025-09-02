@@ -8,7 +8,7 @@
                     <h1 class="header-1 color-accent fw-bold mb-4">Cepat, Jujur, dan Bergaransi</h1>
                     <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid d-lg-none hero-img" alt="Teknisi sedang bekerja">
                     <p class="body-1 color-navy fw-normal mb-4 ">Kami siap membantu mengatasi berbagai masalah pada perangkat Anda, mulai dari laptop standar hingga laptop gaming, dengan layanan profesional dan terpercaya. Percayakan kepada ahlinya!</p>
-                    <a href="https://api.whatsapp.com/send/?phone=6287823330830&text&type=phone_number&app_absent=0" target="_blank" class="btn btn-secondary mb-2">
+                    <a href="https://wa.me/6287823330830?text={{ urlencode('Halo, Saya mau konsultasi mengenai layanan ini. mohon bantuannya...') }}" target="_blank" class="btn btn-secondary mb-2">
                         <i class="fab fa-whatsapp me-2"></i>Consult with Us
                     </a>
                 </section>
@@ -242,7 +242,17 @@
                                 <li>Garansi layanan 30 hari</li>
                             </ul>
                             <div class="d-grid">
-                                <a href="https://api.whatsapp.com/send/?phone=6287823330830&text&type=phone_number&app_absent=0" target="_blank" class="btn btn-primary mb-0">Jadwalkan Sekarang</a>
+                                <a href="https://wa.me/6287823330830?text={{ urlencode('*PROMO MAINTENANCE RUTIN*
+
+Halo, saya tertarik dengan promo maintenance rutin yang menawarkan hemat hingga 20%.
+
+Saya ingin mengetahui lebih lanjut tentang:
+• Pembersihan menyeluruh sistem
+• Update software terbaru
+• Optimasi performa
+• Garansi layanan 30 hari
+
+Mohon informasi jadwal dan estimasi biaya. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Jadwalkan Sekarang</a>
                             </div>
                         </div>
                     </div>
@@ -260,7 +270,17 @@
                                 <li>Maintenance kontrak tahunan</li>
                             </ul>
                             <div class="d-grid">
-                                <a href="https://api.whatsapp.com/send/?phone=6287823330830&text&type=phone_number&app_absent=0" target="_blank" class="btn btn-primary mb-0">Hubungi Tim Corporate</a>
+                                <a href="https://wa.me/6287823330830?text={{ urlencode('*VOUCHER PERUSAHAAN*
+
+Halo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.
+
+Kami membutuhkan informasi tentang:
+• Layanan on-site gratis
+• Harga khusus untuk bulk service
+• Support teknis 24/7
+• Maintenance kontrak tahunan
+
+Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Hubungi Tim Corporate</a>
                             </div>
                         </div>
                     </div>

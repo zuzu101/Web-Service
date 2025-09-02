@@ -63,22 +63,30 @@ class ServiceOrderController extends Controller
 
             DB::commit();
 
-            // Prepare WhatsApp message (simple plain text) and wa.me URL
+                        // Prepare WhatsApp message with better formatting and user perspective
             $waNumber = env('SERVICE_WHATSAPP_NUMBER', '6287823330830');
             $messageLines = [
-                "*Formulir Permintaan Service Baru*" ,
-                " " ,
-                "Nama: {$request->name}",
-                "Kontak: *{$request->phone}*",
-                "Email: {$request->email}",
-                "Alamat: {$request->address}",
-                "Merk: {$request->brand}",
-                "Model: {$request->model}",
-                "Serial Number: {$request->serial_number}",
-                "Keluhan: {$request->reported_issue}",
-                "Nomor Nota: *{$notaNumber}*",
-                " ",
-                "Untuk proses selanjutnya tunggu konfirmasi dari Kami, terimakasih."
+                "*PERMINTAAN SERVICE LAPTOP*",
+                "",
+                "Halo, saya ingin mengajukan service laptop dengan detail berikut:",
+                "",
+                "*Data Pelanggan:*",
+                "• Nama: {$request->name}",
+                "• WhatsApp: {$request->phone}",
+                "• Email: {$request->email}",
+                "• Alamat: {$request->address}",
+                "",
+                "*Detail Perangkat:*",
+                "• Merk: {$request->brand}",
+                "• Model/Series: {$request->model}",
+                "• Serial Number: {$request->serial_number}",
+                "",
+                "*Keluhan/Masalah:*",
+                "{$request->reported_issue}",
+                "",
+                "*Nomor Nota: {$notaNumber}*",
+                "",
+                "Mohon informasi selanjutnya. Terima kasih..."
             ];
 
             $waText = implode("\n", $messageLines);

@@ -370,6 +370,17 @@
     #proses .card .card-body iframe {
         height: 200px;
     }
+
+    #kontak .col-lg-5 {
+        margin-top: 40px;
+    }
+    #kontak .d-flex i{
+        font-size: 26px;
+        margin-top: 2px;
+    }
+    #kontak .d-flex h4{
+        font-size: 18px;
+    }
 }
 
 
@@ -480,6 +491,19 @@
     }
     #kontak .form-label {
         font-size: 14px;
+    }
+    #kontak .col-lg-5 {
+        margin-top: 40px;
+    }
+    #kontak .col-lg-5 H3 {
+        margin-top: 20px;
+    }
+    #kontak .d-flex i{
+        font-size: 22px;
+        margin-right: 12px !important;
+    }
+    #kontak .d-flex h4{
+        font-size: 16px;
     }
 }
 

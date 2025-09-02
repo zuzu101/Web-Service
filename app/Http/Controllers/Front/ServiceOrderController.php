@@ -63,10 +63,32 @@ class ServiceOrderController extends Controller
 
             DB::commit();
 
+            // Prepare WhatsApp message (simple plain text) and wa.me URL
+            $waNumber = env('SERVICE_WHATSAPP_NUMBER', '6287823330830');
+            $messageLines = [
+                "*Formulir Permintaan Service Baru*" ,
+                " " ,
+                "Nama: {$request->name}",
+                "Kontak: *{$request->phone}*",
+                "Email: {$request->email}",
+                "Alamat: {$request->address}",
+                "Merk: {$request->brand}",
+                "Model: {$request->model}",
+                "Serial Number: {$request->serial_number}",
+                "Keluhan: {$request->reported_issue}",
+                "Nomor Nota: *{$notaNumber}*",
+                " ",
+                "Untuk proses selanjutnya tunggu konfirmasi dari Kami, terimakasih."
+            ];
+
+            $waText = implode("\n", $messageLines);
+            $waUrl = 'https://wa.me/' . preg_replace('/[^0-9]/', '', $waNumber) . '?text=' . rawurlencode($waText);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Permintaan service berhasil dikirim! Kami akan segera menghubungi Anda.',
-                'nota_number' => $notaNumber
+                'nota_number' => $notaNumber,
+                'wa_url' => $waUrl
             ]);
 
         } catch (\Exception $e) {

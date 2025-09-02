@@ -586,21 +586,42 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        // Show success message
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            html: `
-                                <p>${data.message}</p>
-                                <p class="mt-2"><strong>Nomor Nota: ${data.nota_number}</strong></p>
-                                <p class="text-muted">Simpan nomor nota ini untuk referensi Anda.</p>
-                            `,
-                            icon: 'success',
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            // Reset form
-                            serviceOrderForm.reset();
-                        });
+                        // If server provided a WhatsApp URL, offer to open it
+                        if (data.wa_url) {
+                            Swal.fire({
+                                title: 'Permintaan Terkirim',
+                                html: `
+                                    <p>${data.message}</p>
+                                    <p class="mt-2"><strong>Nomor Nota: ${data.nota_number}</strong></p>
+                                    <p class="text-muted">Anda dapat melanjutkan transaksi lewat WhatsApp.</p>
+                                `,
+                                icon: 'success',
+                                showCancelButton: true,
+                                confirmButtonText: 'Buka WhatsApp',
+                                cancelButtonText: 'Tutup',
+                                confirmButtonColor: '#25D366'
+                            }).then((res) => {
+                                if (res.isConfirmed) {
+                                    window.open(data.wa_url, '_blank');
+                                }
+                                serviceOrderForm.reset();
+                            });
+                        } else {
+                            // Show simple success
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                html: `
+                                    <p>${data.message}</p>
+                                    <p class="mt-2"><strong>Nomor Nota: ${data.nota_number}</strong></p>
+                                    <p class="text-muted">Simpan nomor nota ini untuk referensi Anda.</p>
+                                `,
+                                icon: 'success',
+                                confirmButtonColor: '#28a745',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                serviceOrderForm.reset();
+                            });
+                        }
                     } else {
                         // Show error message
                         Swal.fire({

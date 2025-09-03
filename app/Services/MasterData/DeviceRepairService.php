@@ -44,9 +44,16 @@ class DeviceRepairService
         }
     }
 
-    public function data(object $deviceRepair)
+    public function data(object $deviceRepair, $request = null)
     {
-        $array = $deviceRepair->with('customers')->orderBy('id', 'desc')->get(['id', 'customer_id', 'brand', 'model', 'reported_issue', 'serial_number', 'technician_note', 'status', 'price', 'complete_in']);
+        $query = $deviceRepair->with('customers')->orderBy('id', 'desc');
+        
+        // Apply status filter if provided (dipindah dari StatusService)
+        if ($request && $request->has('status_filter') && $request->status_filter != '') {
+            $query->where('status', $request->status_filter);
+        }
+        
+        $array = $query->get(['id', 'customer_id', 'brand', 'model', 'reported_issue', 'serial_number', 'technician_note', 'status', 'price', 'complete_in']);
 
         $data = [];
         $no = 0;
@@ -81,13 +88,32 @@ class DeviceRepairService
             
             $nestedData['price'] = $item->price ? 'Rp. ' . number_format($item->price, 0, ',', '.') : '-';
             $nestedData['complete_in'] = $item->complete_in ? $item->complete_in->format('d/m/Y') : '-';
+            
+            // Tambahkan kolom "Ubah Status" (pindahan dari Status page) + Action asli
+            $statusButton = '';
+            if ($currentStatus == 'Perangkat Baru Masuk') {
+                $statusButton = '<a href="javascript:void(0)" onclick="updateStatus(' . $item->id . ', \'Sedang Diperbaiki\')" class="btn btn-outline-warning btn-sm mb-1" title="Mulai Perbaikan">
+                        <i class="fa fa-cog"></i> Mulai
+                    </a>';
+            } elseif ($currentStatus == 'Sedang Diperbaiki') {
+                $statusButton = '<a href="javascript:void(0)" onclick="updateStatus(' . $item->id . ', \'Selesai\')" class="btn btn-outline-success btn-sm mb-1" title="Selesaikan">
+                        <i class="fa fa-check"></i> Selesai
+                    </a>';
+            } elseif ($currentStatus == 'Selesai') {
+                $statusButton = '<a href="' . route('admin.MasterData.DeviceRepair.preview', $item->id) . '" class="btn btn-outline-info btn-sm mb-1" title="Preview Detail">
+                        <i class="fa fa-eye"></i> Detail
+                    </a>';
+            }
+            
+            $nestedData['ubah_status'] = '<div class="text-center">' . $statusButton . '</div>';
+            
             $nestedData['actions'] = '
-                <div class="btn-group">
-                <a href="' . route('admin.MasterData.DeviceRepair.edit', $item) . '" class="btn btn-outline-info btn-sm d-inline-flex align-items-center">
-                    Edit <i class="fas fa-edit ml-2"></i>
+                <div class="btn-group-vertical">
+                <a href="' . route('admin.MasterData.DeviceRepair.edit', $item) . '" class="btn btn-outline-info btn-sm d-inline-flex align-items-center mb-1">
+                    <i class="fas fa-edit mr-1"></i> Edit
                 </a>
                 <a href="javascript:void(0)" onclick="deleteDeviceRepair(' . $item->id . ')" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center">
-                    Hapus <i class="fas fa-trash ml-2"></i>
+                    <i class="fas fa-trash mr-1"></i> Hapus
                 </a>
                 </div>
             ';
@@ -95,6 +121,6 @@ class DeviceRepairService
             $data[] = $nestedData;
         }
 
-        return DataTables::of($data)->rawColumns(["actions", "status"])->toJson();
+        return DataTables::of($data)->rawColumns(["actions", "status", "ubah_status"])->toJson();
     }
 }

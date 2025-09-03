@@ -709,4 +709,331 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             }
         </script>
     @endpush
+
+    <!-- WhatsApp Chatbot Section -->
+    <section id="whatsapp-chatbot">
+        <!-- Floating WhatsApp Button -->
+        <div id="wa-float-btn" title="Chat WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+
+        <!-- Chatbot Modal -->
+        <div id="wa-chatbot-modal">
+            <div id="wa-chatbot-header">
+                <div>
+                    <div style="font-size: 1.1rem;">AIGA</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">Chat Bersama AIGA</div>
+                </div>
+                <button id="wa-chatbot-close" title="Tutup">&times;</button>
+            </div>
+            
+            <div id="wa-chatbot-messages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+
+            <div class="chat-input-form" id="chat-input-area" style="display: none;">
+                <form id="chat-data-form">
+                    <div id="chat-form-fields"></div>
+                    <button type="submit" class="chat-send-btn">Kirim Data</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chatbot JavaScript -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const waBtn = document.getElementById('wa-float-btn');
+            const waModal = document.getElementById('wa-chatbot-modal');
+            const waClose = document.getElementById('wa-chatbot-close');
+            const messagesContainer = document.getElementById('wa-chatbot-messages');
+            const chatInputArea = document.getElementById('chat-input-area');
+            const chatFormFields = document.getElementById('chat-form-fields');
+            const chatDataForm = document.getElementById('chat-data-form');
+            
+            // State management
+            let currentStep = 'start';
+            let userInputs = {};
+            
+            // Initialize
+            waBtn.onclick = () => { 
+                waModal.style.display = 'flex'; 
+                klikWa();
+                initializeChat();
+            };
+            waClose.onclick = () => { 
+                waModal.style.display = 'none';
+                resetChat();
+            };
+
+            function klikWa() {
+                let csrf_token = document.querySelector("meta[name=csrf-token]");
+                if (csrf_token) {
+                    fetch("/klik-wa", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrf_token.getAttribute("content")
+                        },
+                        body: JSON.stringify({})
+                    }).catch(error => {
+                        console.log('klik-wa route not found, continuing anyway'); // Route optional
+                    });
+                }
+            }
+
+            function initializeChat() {
+                // Always reset and initialize chat when opened
+                messagesContainer.innerHTML = '';
+                setTimeout(() => {
+                    addBotMessage('Halo sahabat GawaiKita! Selamat datang di chat AIGA. Ada yang bisa saya bantu?');
+                    setTimeout(() => {
+                        addBotMessage('Mau Booking Online nih?', true, [
+                            {text: 'Mau Booking Online', action: 'booking_online'},
+                            {text: 'Hubungi Kami Langsung', action: 'direct_contact'}
+                        ]);
+                    }, 1500);
+                }, 500);
+            }
+
+            function addBotMessage(text, hasOptions = false, options = []) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message bot';
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'chat-bubble bot';
+                bubbleDiv.innerHTML = text;
+                
+                if (hasOptions && options.length > 0) {
+                    const optionsDiv = document.createElement('div');
+                    optionsDiv.className = 'chat-options';
+                    options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.className = 'chat-option-btn';
+                        btn.textContent = option.text;
+                        btn.dataset.action = option.action;
+                        btn.onclick = () => handleOptionClick(option.action, option.text);
+                        optionsDiv.appendChild(btn);
+                    });
+                    bubbleDiv.appendChild(optionsDiv);
+                }
+                
+                messageDiv.appendChild(bubbleDiv);
+                messagesContainer.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function addUserMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message user';
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'chat-bubble user';
+                bubbleDiv.textContent = text;
+                
+                messageDiv.appendChild(bubbleDiv);
+                messagesContainer.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function handleOptionClick(action, selectedText) {
+                // Add user selection as message
+                addUserMessage(selectedText);
+                
+                // Remove all option buttons
+                document.querySelectorAll('.chat-options').forEach(el => el.remove());
+                
+                if (action === 'booking_online') {
+                    setTimeout(() => {
+                        addBotMessage('Oke kak! Mau lakukan layanan apa nih?', true, [
+                            {text: 'Mau Service Laptop', action: 'service_laptop'},
+                            {text: 'Mau Service Printer', action: 'service_printer'},
+                            {text: 'Mau Service Komputer PC', action: 'service_pc'},
+                            {text: 'Mau Jual Laptop', action: 'jual_laptop'},
+                            {text: 'Mau Beli Aksesoris', action: 'beli_aksesoris'}
+                        ]);
+                    }, 1000);
+                } else if (action === 'direct_contact') {
+                    setTimeout(() => {
+                        addBotMessage('Baik! Silakan hubungi kami langsung melalui WhatsApp untuk konsultasi lebih lanjut.');
+                        sendToWhatsApp('Halo, saya ingin konsultasi mengenai layanan GawaiKita.');
+                    }, 1000);
+                } else if (['service_laptop', 'service_printer', 'service_pc'].includes(action)) {
+                    userInputs.serviceType = action;
+                    setTimeout(() => {
+                        let deviceType = action === 'service_laptop' ? 'laptop' : action === 'service_printer' ? 'printer' : 'komputer PC';
+                        addBotMessage(`AIGA mau tanya, ${deviceType}nya rusak kenapa?`);
+                        showInputForm('complaint');
+                    }, 1000);
+                } else if (action === 'jual_laptop') {
+                    setTimeout(() => {
+                        addBotMessage('Tertarik untuk menjual laptop? Silakan hubungi kami langsung untuk evaluasi harga terbaik!');
+                        sendToWhatsApp('Halo, saya tertarik untuk menjual laptop. Mohon info evaluasi harga terbaik.');
+                    }, 1000);
+                } else if (action === 'beli_aksesoris') {
+                    setTimeout(() => {
+                        addBotMessage('Ingin beli aksesoris laptop? Kunjungi toko online kami di Tokopedia!');
+                        window.open('https://www.tokopedia.com/gawaikita?entrance_name=search_suggestion_store&source=universe&st=product', '_blank');
+                    }, 1000);
+                } else if (action === 'condition_yes' || action === 'condition_no') {
+                    userInputs.condition = action === 'condition_yes' ? 'Ya' : 'Tidak';
+                    setTimeout(() => {
+                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
+                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
+                        addBotMessage(`Apa merek ${deviceType} kamu?`);
+                        showInputForm('brand');
+                    }, 1000);
+                } else if (action === 'pickup_yes' || action === 'pickup_no') {
+                    userInputs.pickup = action === 'pickup_yes' ? 'yes' : 'no';
+                    setTimeout(() => {
+                        addBotMessage('Dengan kakak siapa AIGA melakukan chat?');
+                        showInputForm('name');
+                    }, 1000);
+                }
+            }
+
+            function showInputForm(inputType) {
+                let placeholder = '';
+                
+                switch(inputType) {
+                    case 'complaint': placeholder = 'Masukan keluhan anda'; break;
+                    case 'name': placeholder = 'Masukan nama anda'; break;
+                    case 'phone': placeholder = 'Masukan nomor telepon anda'; break;
+                    case 'brand': placeholder = 'Masukan merek perangkat'; break;
+                    case 'type': placeholder = 'Masukan type perangkat'; break;
+                    case 'address': placeholder = 'Masukan alamat lengkap anda'; break;
+                }
+                
+                let inputHTML = '';
+                if (inputType === 'complaint' || inputType === 'address') {
+                    inputHTML = `<textarea class="chat-input" placeholder="${placeholder}" id="chat-${inputType}" rows="3" required></textarea>`;
+                } else {
+                    inputHTML = `<input type="text" class="chat-input" placeholder="${placeholder}" id="chat-${inputType}" required>`;
+                }
+                
+                chatFormFields.innerHTML = `
+                    <input type="hidden" name="input_type" value="${inputType}">
+                    ${inputHTML}
+                `;
+                chatInputArea.style.display = 'block';
+            }
+
+            chatDataForm.onsubmit = function(e) {
+                e.preventDefault();
+                const fd = new FormData(chatDataForm);
+                const inputType = fd.get('input_type');
+                const value = document.getElementById(`chat-${inputType}`).value.trim();
+                
+                if (!value) {
+                    alert('Form wajib diisi!');
+                    return;
+                }
+                
+                userInputs[inputType] = value;
+                
+                // Add user message
+                addUserMessage(value);
+                
+                // Hide input form
+                chatInputArea.style.display = 'none';
+                
+                // Continue conversation flow
+                continueConversation(inputType);
+            };
+
+            function continueConversation(lastInput) {
+                setTimeout(() => {
+                    if (lastInput === 'complaint') {
+                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
+                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
+                        addBotMessage(`Apa ${deviceType} masih menyala?`, true, [
+                            {text: 'Ya', action: 'condition_yes'},
+                            {text: 'Tidak', action: 'condition_no'}
+                        ]);
+                    } else if (lastInput === 'brand') {
+                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
+                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
+                        addBotMessage(`Type berapa ${deviceType}nya?`);
+                        showInputForm('type');
+                    } else if (lastInput === 'type') {
+                        addBotMessage('Apakah ingin dijemput gratis atau datang sendiri ke store?', true, [
+                            {text: 'Iya saya mau dijemput gratis', action: 'pickup_yes'},
+                            {text: 'Tidak saya mau datang sendiri ke store', action: 'pickup_no'}
+                        ]);
+                    } else if (lastInput === 'name') {
+                        addBotMessage(`Oke kak ${userInputs.name}, nomor telepon/WhatsApp berapa?`);
+                        showInputForm('phone');
+                    } else if (lastInput === 'phone') {
+                        if (userInputs.pickup === 'yes') {
+                            addBotMessage('Untuk alamat lengkapnya dimana?');
+                            showInputForm('address');
+                        } else {
+                            generateFinalWhatsAppMessage();
+                        }
+                    } else if (lastInput === 'address') {
+                        generateFinalWhatsAppMessage();
+                    }
+                }, 1000);
+            }
+
+            function generateFinalWhatsAppMessage() {
+                let message = '';
+                let deviceType = userInputs.serviceType === 'service_laptop' ? 'Laptop' : 
+                                userInputs.serviceType === 'service_printer' ? 'Printer' : 'Komputer PC';
+                
+                message = `*PEMESANAN SERVICE ${deviceType.toUpperCase()}*\n\n`;
+                message += `*Nama:* ${userInputs.name}\n`;
+                message += `*WhatsApp:* ${userInputs.phone}\n`;
+                message += `*Merek:* ${userInputs.brand}\n`;
+                message += `*Type:* ${userInputs.type}\n`;
+                message += `*Keluhan:* ${userInputs.complaint}\n`;
+                message += `*Kondisi:* ${userInputs.condition}\n`;
+                message += `*Dijemput:* ${userInputs.pickup === 'yes' ? 'Ya' : 'Tidak'}\n`;
+                
+                if (userInputs.pickup === 'yes' && userInputs.address) {
+                    message += `*Alamat:* ${userInputs.address}\n`;
+                }
+                
+                message += `\nMohon konfirmasi dan estimasi biaya. Terima kasih!`;
+                
+                addBotMessage('Terima kasih! Data sudah lengkap. Silakan klik tombol di bawah untuk mengirim ke WhatsApp.', true, [
+                    {text: '📱 Kirim ke WhatsApp', action: 'send_whatsapp'}
+                ]);
+                
+                // Store message for WhatsApp
+                userInputs.finalMessage = message;
+            }
+
+            function sendToWhatsApp(message) {
+                if (!message && userInputs.finalMessage) {
+                    message = userInputs.finalMessage;
+                }
+                
+                const waNumber = '6287823330830';
+                const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(message);
+                window.open(waUrl, '_blank');
+                waModal.style.display = 'none';
+                resetChat();
+            }
+
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function resetChat() {
+                currentStep = 'start';
+                userInputs = {};
+                messagesContainer.innerHTML = '';
+                chatInputArea.style.display = 'none';
+                chatDataForm.reset();
+            }
+
+            // Handle send WhatsApp action
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.chat-option-btn') && e.target.textContent.includes('Kirim ke WhatsApp')) {
+                    sendToWhatsApp();
+                }
+            });
+        });
+        </script>
+    </section>
 </x-client.layout>

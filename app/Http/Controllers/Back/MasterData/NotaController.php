@@ -42,7 +42,7 @@ class NotaController extends Controller
     {
         $deviceRepair = $this->notaService->getNotaData($id);
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
-        
+
         return view('back.MasterData.Nota.print', compact('deviceRepair', 'notaNumber'));
     }
 
@@ -55,7 +55,7 @@ class NotaController extends Controller
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
         
         $pdf = Pdf::loadView('back.MasterData.Nota.pdf', compact('deviceRepair', 'notaNumber'));
-        $pdf->setPaper('a5', 'portrait');
+        $pdf->setPaper([0,0,165.025984252, 9321.122834646], 'portrait');
         
         return $pdf->download($notaNumber . '.pdf');
     }

@@ -87,9 +87,9 @@ class DeviceRepairController extends Controller
         return response()->json(['message' => "Data berhasil dihapus"],200);
     }
 
-    public function data(DeviceRepair $deviceRepair)
+    public function data(DeviceRepair $deviceRepair, Request $request)
     {
-        return $this->deviceRepairService->data($deviceRepair);
+        return $this->deviceRepairService->data($deviceRepair, $request);
     }
 
     //function to update device repair status
@@ -98,5 +98,12 @@ class DeviceRepairController extends Controller
         $deviceRepair->update(['status' => $request->status]);
 
         return response()->json(['message' => "Status berhasil diperbarui"], 200);
+    }
+
+    // Function untuk preview detail device repair (pindahan dari Status)
+    public function preview(DeviceRepair $deviceRepair)
+    {
+        $deviceRepair->load('customers');
+        return view('back.MasterData.DeviceRepair.preview', compact('deviceRepair'));
     }
 }

@@ -21,14 +21,7 @@
                         <p>Perangkat</p>
                     </a>
                 </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('admin.MasterData.Status.index') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Status.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-info-circle"></i>
-                        <p>Status</p>
-                    </a>
-                </li>
-
+                
                 <li class="nav-item">
                     <a href="{{ route('admin.MasterData.Nota.index') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Nota.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-receipt"></i>

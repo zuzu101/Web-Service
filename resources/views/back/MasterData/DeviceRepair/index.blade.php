@@ -18,9 +18,20 @@
 @section('content')
 <section class="card">
     <article class="card-header">
-        <div class="float-left">
+        <div class="float-right">
             <div class="btn-group">
                 <a href="{{ route('admin.MasterData.DeviceRepair.create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Tambah Perangkat</a>
+            </div>
+        </div>
+        <div class="float-left">
+            <div class="form-inline">
+                <label for="statusFilterDropdown" class="mr-2 font-weight-bold">Filter Status:</label>
+                <select class="form-control" id="statusFilterDropdown">
+                    <option value="">Semua</option>
+                    <option value="Perangkat Baru Masuk">Baru</option>
+                    <option value="Sedang Diperbaiki">Dikerjakan</option>
+                    <option value="Selesai">Selesai</option>
+                </select>
             </div>
         </div>
     </article>
@@ -37,8 +48,9 @@
                     <th>Catatan Teknisi</th>
                     <th>Status</th>
                     <th>Target Selesai</th>
-                    <th>Action</th>
                     <th>Estimasi Biaya</th>
+                    <th>Ubah Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -50,8 +62,10 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    let dataTable;
+    
     $(function() {
-        $('#datatable').DataTable({
+        dataTable = $('#datatable').DataTable({
             responsive: true,
             processing: true,
             serverSide: true,
@@ -62,9 +76,12 @@
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                 url: "{{ route('admin.MasterData.DeviceRepair.data') }}",
                 dataType: "json",
-                type: "POST"
+                type: "POST",
+                data: function(d) {
+                    d.status_filter = $('#status_filter').val();
+                }
             },
-            //column for DeviceRepair
+            //column for DeviceRepair dengan kolom Ubah Status
             columns: [
                 { data: 'no', name: 'no', className: "text-center align-middle" },
                 { data: 'pelanggan_name', name: 'pelanggan_name', className: "align-middle" },
@@ -75,10 +92,24 @@
                 { data: 'technician_note', name: 'technician_note', className: "align-middle" },
                 { data: 'status', name: 'status', className: "align-middle" },
                 { data: 'complete_in', name: 'complete_in', className: "align-middle text-center" },
+                { data: 'price', name: 'price', className: "align-middle" },
+                { data: 'ubah_status', name: 'ubah_status', className: "text-center align-middle", sortable: false, searchable: false },
                 { data: 'actions', name: 'actions', className: "align-middle", sortable: false, searchable: false },
-                { data: 'price', name: 'price', className: "align-middle    " },
             ]
-            ,
+        });
+
+        // Filter Status (pindahan dari Status page)
+        $('#statusFilterDropdown').on('change', function() {
+            let status = $(this).val();
+
+            // Buat atau update hidden input untuk dikirim ke server
+            if (!$('#status_filter').length) {
+                $('body').append('<input type="hidden" id="status_filter" value="">');
+            }
+            $('#status_filter').val(status);
+
+            // Reload DataTable
+            dataTable.ajax.reload();
         });
     });
 
@@ -106,7 +137,7 @@
                             timer: 2000,
                             showConfirmButton: false
                         });
-                        $('#datatable').DataTable().ajax.reload();
+                        dataTable.ajax.reload();
                     },
                     error: function(xhr) {
                         Swal.fire({
@@ -114,6 +145,49 @@
                             text: 'Terjadi kesalahan saat menghapus data',
                             icon: 'error'
                         });
+                    }
+                });
+            }
+        });
+    }
+    
+    // Function updateStatus pindahan dari Status page
+    function updateStatus(id, status) {
+        Swal.fire({
+            title: 'Ubah Status Device?',
+            text: `Apakah Anda yakin ingin mengubah status ke "${status}"?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Ubah!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ route('admin.MasterData.DeviceRepair.index') }}/" + id + '/update-status',
+                    method: 'POST',
+                    headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                    data: {
+                        status: status
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Status berhasil diperbarui',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        dataTable.ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat memperbarui status',
+                            icon: 'error'
+                        });
+                        console.log(xhr.responseText);
                     }
                 });
             }

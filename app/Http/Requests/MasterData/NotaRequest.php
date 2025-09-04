@@ -11,7 +11,7 @@ class NotaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,20 @@ class NotaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'paid_amount' => 'nullable|numeric|min:0'
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'paid_amount.numeric' => 'Jumlah pembayaran harus berupa angka.',
+            'paid_amount.min' => 'Jumlah pembayaran tidak boleh kurang dari 0.'
         ];
     }
 }

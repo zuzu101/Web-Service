@@ -57,9 +57,6 @@
         }
         .value {
             display: inline-block;
-            width: 65%;
-            word-wrap: break-word;
-            vertical-align: top;
         }
         .device-section {
             border: 1px solid #000;
@@ -79,11 +76,12 @@
             border-top: 1px solid #000;
             padding-top: 5px;
             margin-top: 8px;
-            text-align: center;
+            text-align: left;
         }
         .total-price {
             font-size: 10px;
             font-weight: bold;
+            text-align: center
         }
         .signature {
             margin-top: 15px;
@@ -174,14 +172,30 @@
         </div>
         @endif
     </div>
+    
 
     <div class="price-section">
+        @if(isset($paidAmount) && $paidAmount > 0)
         <div class="info-row">
-            <span class="label">Biaya:</span>
-            <span class="value total-price">
-                {{ $deviceRepair->price ? 'Rp ' . number_format($deviceRepair->price, 0, ',', '.') : 'TBD' }}
-            </span>
+            <span class="label">Bayar:</span>
+            <span class="value">Rp.{{ number_format($paidAmount, 0, ',', '.') }}</span>
         </div>
+        <div class="info-row">
+            <span class="label">Harga:</span>
+            <span class="value">{{ $deviceRepair->price ? 'Rp.' . number_format($deviceRepair->price, 0, ',', '.') : 'Belum ditentukan' }}</span>
+        </div>
+        <div class="info-row" style="border-bottom: 1px dashed #000; line-height: 1;"></div>
+        @if(isset($change) && $change > 0)
+        <div class="info-row">
+            <span class="label">Kembali:</span>
+            <span class="value">Rp.{{ number_format($change, 0, ',', '.') }}</span>
+        </div>
+        @endif
+        <div class="sign-line"></div>
+        <div class="total-price">
+            <strong>STATUS: LUNAS</strong>
+        </div>
+        @endif
     </div>
 
     <div class="signature">
@@ -191,7 +205,7 @@
             <div>({{ Str::limit($deviceRepair->customers->name ?? '...........', 15) }})</div>
         </div>
         <div class="sign-box">
-            <div>Teknisi</div>
+            <div>PT.LaptopService</div>
             <div class="sign-line"></div>
             <div>(...........)</div>
         </div>

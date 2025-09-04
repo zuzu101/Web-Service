@@ -57,9 +57,6 @@
         }
         .value {
             display: inline-block;
-            width: 65%;
-            word-wrap: break-word;
-            vertical-align: top;
         }
         .device-section {
             border: 1px solid #000;
@@ -79,11 +76,12 @@
             border-top: 1px solid #000;
             padding-top: 5px;
             margin-top: 8px;
-            text-align: center;
+            text-align: left;
         }
         .total-price {
             font-size: 10px;
             font-weight: bold;
+            text-align: center
         }
         .signature {
             margin-top: 15px;
@@ -112,13 +110,6 @@
         * {
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
-        @media print {
-            body { 
-                margin: 0; 
-                padding: 2mm;
-            }
-            .no-print { display: none; }
         }
     </style>
 </head>
@@ -181,12 +172,34 @@
         </div>
         @endif
     </div>
+    
 
     <div class="price-section">
         <div class="info-row">
             <span class="label">Harga:</span>
             <span class="value">{{ $deviceRepair->price ? 'Rp.' . number_format($deviceRepair->price, 0, ',', '.') : 'Belum ditentukan' }}</span>
         </div>
+        
+        @if(isset($paidAmount) && $paidAmount > 0)
+        <div class="info-row">
+            <span class="label">Bayar:</span>
+            <span class="value">Rp.{{ number_format($paidAmount, 0, ',', '.') }}</span>
+        </div>
+        <div class="info-row" style="border-bottom: 1px dashed #000; line-height: 1;"></div>
+        @if(isset($change) && $change > 0)
+        <div class="info-row">
+            <span class="label">Kembali:</span>
+            <span class="value">Rp.{{ number_format($change, 0, ',', '.') }}</span>
+        </div>
+        @endif
+        <div class="total-price">
+            <strong>STATUS: LUNAS</strong>
+        </div>
+        @else
+        <div class="total-price">
+            <strong>STATUS: BELUM LUNAS</strong>
+        </div>
+        @endif
     </div>
 
     <div class="signature">
@@ -196,7 +209,7 @@
             <div>({{ Str::limit($deviceRepair->customers->name ?? '...........', 15) }})</div>
         </div>
         <div class="sign-box">
-            <div>Teknisi</div>
+            <div>PT.LaptopService</div>
             <div class="sign-line"></div>
             <div>(...........)</div>
         </div>
@@ -214,8 +227,24 @@
 
     <script>
         window.onload = function() {
+            // Auto print when page loads
             window.print();
+            
+            // Optional: Close window after printing (for popup windows)
+            setTimeout(function() {
+                if (window.opener) {
+                    window.close();
+                }
+            }, 1000);
         }
+        
+        // Handle print button click if needed
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
     </script>
 </body>
 </html>

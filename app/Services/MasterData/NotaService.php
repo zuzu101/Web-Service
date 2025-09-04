@@ -52,19 +52,27 @@ class NotaService
             $nestedData['complete_date'] = $item->complete_in ? $item->complete_in->format('d/m/Y') : '-';
             $nestedData['actions'] = '
                 <div class="btn-group">
-                    <a href="' . route('admin.MasterData.Nota.print', $item->id) . '" class="btn btn-outline-info btn-sm d-inline-flex align-items-center" target="_blank">
+                    <button class="btn btn-outline-info btn-sm d-inline-flex align-items-center btn-print" 
+                            data-id="' . $item->id . '" 
+                            data-price="' . ($item->price ?: 0) . '" 
+                            data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
+                            data-device="' . $item->brand . ' ' . $item->model . '">
                         Print <i class="fa fa-print ml-2"></i> 
-                    </a>
-                    <a href="' . route('admin.MasterData.Nota.pdf', $item->id) . '" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center" target="_blank">
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center btn-pdf" 
+                            data-id="' . $item->id . '" 
+                            data-price="' . ($item->price ?: 0) . '" 
+                            data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
+                            data-device="' . $item->brand . ' ' . $item->model . '">
                         PDF <i class="fa fa-file-pdf ml-2"></i>
-                    </a>
+                    </button>
                 </div>
             ';
 
             $data[] = $nestedData;
         }
 
-        return DataTables::of($data)->rawColumns(["actions", "status"])->toJson();
+        return DataTables::of(collect($data))->rawColumns(["actions", "status"])->toJson();
     }
 
     public function getNotaData($id)

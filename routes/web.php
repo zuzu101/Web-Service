@@ -58,8 +58,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
             Route::resource('Nota', NotaController::class)->only('index');
             Route::group(['prefix' => 'Nota', 'as' => 'Nota.'], function () {
                 Route::post('data', [NotaController::class, 'data'])->name('data');
-                Route::get('{id}/print', [NotaController::class, 'print'])->name('print');
-                Route::get('{id}/pdf', [NotaController::class, 'pdf'])->name('pdf');
+                Route::match(['GET', 'POST'], '{id}/print', [NotaController::class, 'print'])->name('print');
+                Route::match(['GET', 'POST'], '{id}/pdf', [NotaController::class, 'pdf'])->name('pdf');
             });
 
             // Report Routes

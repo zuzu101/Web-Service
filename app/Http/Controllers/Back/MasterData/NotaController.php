@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Back\MasterData;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MasterData\NotaRequest;
 use App\Models\MasterData\DeviceRepair;
 use App\Services\MasterData\NotaService;
 use Illuminate\Http\Request;
@@ -38,23 +39,31 @@ class NotaController extends Controller
     /**
      * Print nota (thermal print view)
      */
-    public function print($id)
+    public function print($id, Request $request = null)
     {
         $deviceRepair = $this->notaService->getNotaData($id);
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
+        
+        // Get payment info from request (support both GET and POST)
+        $paidAmount = $request ? $request->get('paid_amount', 0) : 0;
+        $change = max(0, $paidAmount - ($deviceRepair->price ?? 0));
 
-        return view('back.MasterData.Nota.print', compact('deviceRepair', 'notaNumber'));
+        return view('back.MasterData.Nota.print', compact('deviceRepair', 'notaNumber', 'paidAmount', 'change'));
     }
 
     /**
      * Generate PDF nota
      */
-    public function pdf($id)
+    public function pdf($id, Request $request = null)
     {
         $deviceRepair = $this->notaService->getNotaData($id);
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
         
-        $pdf = Pdf::loadView('back.MasterData.Nota.pdf', compact('deviceRepair', 'notaNumber'));
+        // Get payment info from request (support both GET and POST)
+        $paidAmount = $request ? $request->get('paid_amount', 0) : 0;
+        $change = max(0, $paidAmount - ($deviceRepair->price ?? 0));
+        
+        $pdf = Pdf::loadView('back.MasterData.Nota.pdf', compact('deviceRepair', 'notaNumber', 'paidAmount', 'change'));
         $pdf->setPaper([0,0,165.025984252, 9321.122834646], 'portrait');
         
         return $pdf->download($notaNumber . '.pdf');

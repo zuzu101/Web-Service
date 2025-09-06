@@ -27,4 +27,28 @@ class HomeController extends Controller
 
         return view('front.home.index', compact('brands'));
     }
+
+    public function cekStatus(Request $request)
+    {
+        $servis = null;
+        $notFound = false;
+        $searched = false;
+        
+        // Jika ada parameter pencarian nomor servis
+        if ($request->has('no_servis') && !empty($request->no_servis)) {
+            $searched = true;
+            
+            // Cari data berdasarkan nomor nota
+            $servis = DeviceRepair::with('customers')
+                ->where('nota_number', $request->no_servis)
+                ->first();
+            
+            // Jika tidak ditemukan
+            if (!$servis) {
+                $notFound = true;
+            }
+        }
+        
+        return view('front.page.cekstatus', compact('servis', 'notFound', 'searched'));
+    }
 }

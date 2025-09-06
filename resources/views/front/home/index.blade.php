@@ -1,4 +1,4 @@
-<x-client.layout>
+﻿<x-client.layout>
     <header id="hero">
         <div class="container">
             <div class="row align-items-center justify-content-center text-center text-lg-start">
@@ -721,8 +721,8 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
         <div id="wa-chatbot-modal">
             <div id="wa-chatbot-header">
                 <div>
-                    <div style="font-size: 1.1rem;">AIGA</div>
-                    <div style="font-size: 0.8rem; opacity: 0.8;">Chat Bersama AIGA</div>
+                    <div style="font-size: 1.1rem;">LASO</div>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">LaptopService Assistant</div>
                 </div>
                 <button id="wa-chatbot-close" title="Tutup">&times;</button>
             </div>
@@ -734,7 +734,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             <div class="chat-input-form" id="chat-input-area" style="display: none;">
                 <form id="chat-data-form">
                     <div id="chat-form-fields"></div>
-                    <button type="submit" class="chat-send-btn">Kirim Data</button>
+                    <button type="submit" class="chat-send-btn" id="default-submit-btn">Kirim Data</button>
                 </form>
             </div>
         </div>
@@ -750,20 +750,142 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             const chatFormFields = document.getElementById('chat-form-fields');
             const chatDataForm = document.getElementById('chat-data-form');
             
-            // State management
+            // State management with localStorage persistence
             let currentStep = 'start';
             let userInputs = {};
             
+            // Load saved state from localStorage
+            function loadChatState() {
+                try {
+                    const savedState = localStorage.getItem('chatbot_state');
+                    const savedMessages = localStorage.getItem('chatbot_messages');
+                    
+                    if (savedState) {
+                        const state = JSON.parse(savedState);
+                        currentStep = state.currentStep || 'start';
+                        userInputs = state.userInputs || {};
+                        console.log('Loaded chat state:', state);
+                    }
+                    
+                    if (savedMessages && savedMessages.trim() !== '') {
+                        const messages = JSON.parse(savedMessages);
+                        if (messages && messages.trim() !== '') {
+                            messagesContainer.innerHTML = messages;
+                            console.log('Loaded saved messages');
+                            return true; // Has existing messages
+                        }
+                    }
+                } catch (error) {
+                    console.log('Error loading chat state:', error);
+                    // Reset to default if error
+                    currentStep = 'start';
+                    userInputs = {};
+                    clearChatState(); // Clear corrupted data
+                }
+                return false; // No existing messages
+            }
+            
+            // Save state to localStorage
+            function saveChatState() {
+                try {
+                    const state = {
+                        currentStep: currentStep,
+                        userInputs: userInputs
+                    };
+                    localStorage.setItem('chatbot_state', JSON.stringify(state));
+                    
+                    // Only save messages if container has content
+                    if (messagesContainer && messagesContainer.innerHTML.trim()) {
+                        localStorage.setItem('chatbot_messages', JSON.stringify(messagesContainer.innerHTML));
+                    }
+                    console.log('Chat state saved');
+                } catch (error) {
+                    console.log('Error saving chat state:', error);
+                    // If localStorage is full or corrupted, clear it
+                    if (error.name === 'QuotaExceededError') {
+                        clearChatState();
+                    }
+                }
+            }
+            
+            // Clear saved state (only on manual reset)
+            function clearChatState() {
+                try {
+                    localStorage.removeItem('chatbot_state');
+                    localStorage.removeItem('chatbot_messages');
+                    console.log('Chat state cleared');
+                } catch (error) {
+                    console.log('Error clearing chat state:', error);
+                }
+            }
+            
+            // Emergency function to force reset chatbot (for debugging)
+            window.resetChatbot = function() {
+                console.log('Force resetting chatbot...');
+                clearChatState();
+                messagesContainer.innerHTML = '';
+                currentStep = 'start';
+                userInputs = {};
+                chatInputArea.style.display = 'none';
+                
+                // Close chatbot first
+                closeChatbot();
+                
+                // Re-initialize with fresh state after short delay
+                setTimeout(() => {
+                    openChatbot();
+                }, 500);
+            };
+            
             // Initialize
             waBtn.onclick = () => { 
-                waModal.style.display = 'flex'; 
-                klikWa();
-                initializeChat();
+                toggleChatbot();
             };
             waClose.onclick = () => { 
-                waModal.style.display = 'none';
-                resetChat();
+                closeChatbot();
             };
+            
+            // Toggle chatbot function
+            function toggleChatbot() {
+                if (waModal.style.display === 'flex') {
+                    closeChatbot();
+                } else {
+                    openChatbot();
+                }
+            }
+            
+            // Open chatbot with animation
+            function openChatbot() {
+                waModal.style.display = 'flex';
+                waModal.style.opacity = '0';
+                waModal.style.transform = 'translateY(20px) scale(0.95)';
+                
+                // Trigger opening animation
+                setTimeout(() => {
+                    waModal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    waModal.style.opacity = '1';
+                    waModal.style.transform = 'translateY(0) scale(1)';
+                }, 10);
+                
+                klikWa();
+                initializeChat();
+            }
+            
+            // Close chatbot with animation
+            function closeChatbot() {
+                waModal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                waModal.style.opacity = '0';
+                waModal.style.transform = 'translateY(20px) scale(0.95)';
+                
+                // Hide modal after animation
+                setTimeout(() => {
+                    waModal.style.display = 'none';
+                    waModal.style.transition = '';
+                }, 300);
+                
+                // Save current state when closing
+                saveChatState();
+            }
 
             function klikWa() {
                 let csrf_token = document.querySelector("meta[name=csrf-token]");
@@ -782,17 +904,56 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             }
 
             function initializeChat() {
-                // Always reset and initialize chat when opened
-                messagesContainer.innerHTML = '';
-                setTimeout(() => {
-                    addBotMessage('Halo sahabat GawaiKita! Selamat datang di chat AIGA. Ada yang bisa saya bantu?');
+                console.log('Initializing chat...');
+                
+                // Load existing state first
+                const hasExistingMessages = loadChatState();
+                
+                // If no existing messages, start fresh
+                if (!hasExistingMessages) {
+                    console.log('No existing messages, starting fresh chat');
+                    messagesContainer.innerHTML = ''; // Clear any corrupted content
+                    
                     setTimeout(() => {
-                        addBotMessage('Mau Booking Online nih?', true, [
-                            {text: 'Mau Booking Online', action: 'booking_online'},
-                            {text: 'Hubungi Kami Langsung', action: 'direct_contact'}
-                        ]);
-                    }, 1500);
-                }, 500);
+                        addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
+                        setTimeout(() => {
+                            addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
+                                {text: 'Service Laptop', action: 'service_laptop'},
+                                {text: 'Hubungi Langsung', action: 'direct_contact'}
+                            ]);
+                        }, 1500);
+                    }, 500);
+                } else {
+                    console.log('Found existing messages, restoring chat');
+                    // Re-attach event listeners to existing buttons
+                    reattachButtonListeners();
+                }
+                
+                // Always scroll to bottom when opening
+                setTimeout(() => {
+                    scrollToBottom();
+                }, 100);
+            }
+            
+            // Function to reattach event listeners to existing option buttons
+            function reattachButtonListeners() {
+                const optionButtons = document.querySelectorAll('.chat-option-btn');
+                optionButtons.forEach(btn => {
+                    const action = btn.dataset.action;
+                    const text = btn.textContent;
+                    btn.onclick = () => handleOptionClick(action, text);
+                });
+                
+                // Re-apply animations to restored messages
+                const messages = document.querySelectorAll('.chat-message');
+                messages.forEach((msg, index) => {
+                    msg.style.opacity = '0';
+                    msg.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        msg.style.opacity = '1';
+                        msg.style.transform = 'translateY(0)';
+                    }, index * 100); // Stagger animation
+                });
             }
 
             function addBotMessage(text, hasOptions = false, options = []) {
@@ -819,7 +980,17 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 
                 messageDiv.appendChild(bubbleDiv);
                 messagesContainer.appendChild(messageDiv);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                }, 50);
+                
                 scrollToBottom();
+                
+                // Save state after adding message
+                saveChatState();
             }
 
             function addUserMessage(text) {
@@ -832,7 +1003,17 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 
                 messageDiv.appendChild(bubbleDiv);
                 messagesContainer.appendChild(messageDiv);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                }, 50);
+                
                 scrollToBottom();
+                
+                // Save state after adding message
+                saveChatState();
             }
 
             function handleOptionClick(action, selectedText) {
@@ -842,52 +1023,124 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 // Remove all option buttons
                 document.querySelectorAll('.chat-options').forEach(el => el.remove());
                 
-                if (action === 'booking_online') {
+                if (action === 'service_laptop') {
                     setTimeout(() => {
-                        addBotMessage('Oke kak! Mau lakukan layanan apa nih?', true, [
-                            {text: 'Mau Service Laptop', action: 'service_laptop'},
-                            {text: 'Mau Service Printer', action: 'service_printer'},
-                            {text: 'Mau Service Komputer PC', action: 'service_pc'},
-                            {text: 'Mau Jual Laptop', action: 'jual_laptop'},
-                            {text: 'Mau Beli Aksesoris', action: 'beli_aksesoris'}
-                        ]);
+                        addBotMessage('Sip! Mari kita bantu service laptop Anda. Pertama, apa keluhan atau masalah pada laptop Anda?');
+                        showInputForm('reported_issue');
                     }, 1000);
                 } else if (action === 'direct_contact') {
                     setTimeout(() => {
                         addBotMessage('Baik! Silakan hubungi kami langsung melalui WhatsApp untuk konsultasi lebih lanjut.');
-                        sendToWhatsApp('Halo, saya ingin konsultasi mengenai layanan GawaiKita.');
+                        sendToWhatsApp('Halo, saya ingin konsultasi mengenai layanan service laptop.');
                     }, 1000);
-                } else if (['service_laptop', 'service_printer', 'service_pc'].includes(action)) {
-                    userInputs.serviceType = action;
+                } else if (action === 'promo_maintenance') {
                     setTimeout(() => {
-                        let deviceType = action === 'service_laptop' ? 'laptop' : action === 'service_printer' ? 'printer' : 'komputer PC';
-                        addBotMessage(`AIGA mau tanya, ${deviceType}nya rusak kenapa?`);
-                        showInputForm('complaint');
+                        addBotMessage('🎉 Promo Maintenance Rutin! Hemat hingga 20% untuk perawatan berkala:\n\n• Pembersihan menyeluruh sistem\n• Update software terbaru\n• Optimasi performa\n• Garansi layanan 30 hari\n\nMau langsung booking maintenance atau lanjut service biasa?', true, [
+                            {text: '📅 Booking Maintenance', action: 'booking_maintenance'},
+                            {text: '🔧 Lanjut Service Biasa', action: 'skip_promo'}
+                        ]);
                     }, 1000);
-                } else if (action === 'jual_laptop') {
+                } else if (action === 'promo_corporate') {
                     setTimeout(() => {
-                        addBotMessage('Tertarik untuk menjual laptop? Silakan hubungi kami langsung untuk evaluasi harga terbaik!');
-                        sendToWhatsApp('Halo, saya tertarik untuk menjual laptop. Mohon info evaluasi harga terbaik.');
+                        addBotMessage('🏢 Voucher Perusahaan! Khusus untuk kebutuhan kantor:\n\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nMau konsultasi corporate atau lanjut service individu?', true, [
+                            {text: '💼 Konsultasi Corporate', action: 'corporate_consultation'},
+                            {text: '👤 Service Individu', action: 'skip_promo'}
+                        ]);
                     }, 1000);
-                } else if (action === 'beli_aksesoris') {
+                } else if (action === 'booking_maintenance') {
                     setTimeout(() => {
-                        addBotMessage('Ingin beli aksesoris laptop? Kunjungi toko online kami di Tokopedia!');
-                        window.open('https://www.tokopedia.com/gawaikita?entrance_name=search_suggestion_store&source=universe&st=product', '_blank');
+                        addBotMessage('Mantap! Mari kita booking maintenance rutin. Apa keluhan atau yang ingin di-maintenance?');
+                        showInputForm('reported_issue');
+                        userInputs.serviceType = 'maintenance';
                     }, 1000);
-                } else if (action === 'condition_yes' || action === 'condition_no') {
-                    userInputs.condition = action === 'condition_yes' ? 'Ya' : 'Tidak';
+                } else if (action === 'corporate_consultation') {
                     setTimeout(() => {
-                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
-                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
-                        addBotMessage(`Apa merek ${deviceType} kamu?`);
-                        showInputForm('brand');
+                        addBotMessage('Terima kasih! Untuk konsultasi corporate, saya akan hubungkan dengan tim khusus kami.');
+                        sendToWhatsApp('*KONSULTASI CORPORATE*\n\nHalo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.\n\nKami membutuhkan informasi tentang:\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nMohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!');
                     }, 1000);
-                } else if (action === 'pickup_yes' || action === 'pickup_no') {
-                    userInputs.pickup = action === 'pickup_yes' ? 'yes' : 'no';
+                } else if (action === 'skip_promo') {
                     setTimeout(() => {
-                        addBotMessage('Dengan kakak siapa AIGA melakukan chat?');
+                        addBotMessage('Oke, mari kita lanjut untuk service laptop. Apa keluhan atau masalah pada laptop Anda?');
+                        showInputForm('reported_issue');
+                    }, 1000);
+                } else if (action === 'laptop_on' || action === 'laptop_partially' || action === 'laptop_off') {
+                    let conditionText = '';
+                    let responseMessage = '';
+                    
+                    if (action === 'laptop_on') {
+                        conditionText = 'Masih menyala normal';
+                        responseMessage = 'Bagus sekali! Laptop yang masih menyala memudahkan proses diagnosis dan biasanya lebih cepat selesai 👍';
+                    } else if (action === 'laptop_partially') {
+                        conditionText = 'Menyala tapi bermasalah';
+                        responseMessage = 'Oke, laptop masih hidup tapi ada gangguannya ya. Ini sebenarnya kondisi yang baik untuk diperbaiki 💪';
+                    } else {
+                        conditionText = 'Tidak bisa menyala';
+                        responseMessage = 'Hmm, laptop mati total memang tricky. Tapi tenang, teknisi kami sudah berpengalaman puluhan tahun menangani kasus seperti ini! 🔧';
+                    }
+                    
+                    userInputs.condition = conditionText;
+                    
+                    setTimeout(() => {
+                        addBotMessage(responseMessage);
+                        setTimeout(() => {
+                            addBotMessage('Sekarang, laptop merek apa yang bermasalah?');
+                            showInputForm('brand');
+                        }, 1500);
+                    }, 1000);
+                } else if (action === 'show_promo_maintenance') {
+                    setTimeout(() => {
+                        addBotMessage('🎉 Promo Maintenance Rutin!\n\nHemat hingga 20% untuk perawatan berkala laptop Anda:\n• Pembersihan menyeluruh sistem\n• Update software terbaru\n• Optimasi performa\n• Garansi layanan 30 hari\n\nApakah Anda tertarik dengan promo ini?', true, [
+                            {text: '✅ Ya, Tertarik!', action: 'interested_maintenance'},
+                            {text: '⏭️ Tidak, Lanjut Service', action: 'continue_to_name'}
+                        ]);
+                    }, 1000);
+                } else if (action === 'show_promo_corporate') {
+                    setTimeout(() => {
+                        addBotMessage('🏢 Voucher Perusahaan!\n\nLayanan khusus untuk kebutuhan kantor:\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nApakah ini untuk kebutuhan perusahaan?', true, [
+                            {text: '✅ Ya, Untuk Perusahaan', action: 'corporate_interest'},
+                            {text: '👤 Tidak, Service Pribadi', action: 'continue_to_name'}
+                        ]);
+                    }, 1000);
+                } else if (action === 'interested_maintenance') {
+                    userInputs.serviceType = 'maintenance';
+                    setTimeout(() => {
+                        addBotMessage('Bagus! Kami akan catat minat Anda untuk maintenance rutin. Mari lanjut dengan data Anda:');
+                        setTimeout(() => {
+                            addBotMessage('maaf nih LASO lupa nanya, nama kakak siapa yah?');
+                            showInputForm('name');
+                        }, 1000);
+                    }, 1000);
+                } else if (action === 'corporate_interest') {
+                    userInputs.serviceType = 'corporate';
+                    setTimeout(() => {
+                        addBotMessage('Terima kasih! Untuk layanan corporate, tim khusus kami akan menghubungi Anda. Mari kita ambil kontak Anda dulu:');
+                        setTimeout(() => {
+                            addBotMessage('Siapa nama Anda atau nama perusahaan?');
+                            showInputForm('name');
+                        }, 1000);
+                    }, 1000);
+                } else if (action === 'continue_to_name') {
+                    setTimeout(() => {
+                        addBotMessage('maaf nih LASO lupa nanya, nama kakak siapa yah?');
                         showInputForm('name');
                     }, 1000);
+                } else if (action === 'send_whatsapp') {
+                    // Langsung redirect ke WhatsApp tanpa delay berlebihan
+                    console.log('=== Tombol Kirim ke WA diklik ===');
+                    sendToWhatsApp();
+                } else if (action === 'copy_message') {
+                    // Copy message to clipboard as fallback
+                    let message = userInputs.finalMessage || '';
+                    if (userInputs.notaNumber) {
+                        message += `\n\n*📋 NOMOR NOTA: ${userInputs.notaNumber}*\n`;
+                        message += `_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_`;
+                    }
+                    
+                    navigator.clipboard.writeText(message).then(() => {
+                        addBotMessage('✅ Pesan berhasil disalin! Silakan paste di WhatsApp manual ke: 087823330830');
+                    }).catch(() => {
+                        addBotMessage('❌ Gagal copy otomatis. Silakan hubungi WhatsApp: 087823330830');
+                    });
                 }
             }
 
@@ -895,33 +1148,171 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 let placeholder = '';
                 
                 switch(inputType) {
-                    case 'complaint': placeholder = 'Masukan keluhan anda'; break;
-                    case 'name': placeholder = 'Masukan nama anda'; break;
-                    case 'phone': placeholder = 'Masukan nomor telepon anda'; break;
-                    case 'brand': placeholder = 'Masukan merek perangkat'; break;
-                    case 'type': placeholder = 'Masukan type perangkat'; break;
-                    case 'address': placeholder = 'Masukan alamat lengkap anda'; break;
+                    case 'reported_issue': placeholder = 'Contoh: Laptop tiba-tiba mati total saat digunakan'; break;
+                    case 'name': placeholder = 'Masukan nama Anda'; break;
+                    case 'phone': placeholder = 'Contoh: 081234567890'; break;
+                    case 'brand': placeholder = 'Pilih merek laptop Anda'; break;
+                    case 'model': placeholder = 'Masukan type anda'; break;
+                    case 'address': placeholder = 'Contoh: Jl. Melati No. 10, RT 03 RW 02, Bandung'; break;
                 }
                 
                 let inputHTML = '';
-                if (inputType === 'complaint' || inputType === 'address') {
+                if (inputType === 'reported_issue' || inputType === 'address') {
                     inputHTML = `<textarea class="chat-input" placeholder="${placeholder}" id="chat-${inputType}" rows="3" required></textarea>`;
+                } else if (inputType === 'brand') {
+                    // For brand, show dropdown with data from API
+                    inputHTML = `<select class="chat-input" id="chat-${inputType}" required>
+                        <option value="">${placeholder}</option>
+                        <option value="loading">Loading...</option>
+                    </select>`;
                 } else {
                     inputHTML = `<input type="text" class="chat-input" placeholder="${placeholder}" id="chat-${inputType}" required>`;
+                }
+                
+                // Special handling for model input - add additional buttons
+                let additionalButtons = '';
+                if (inputType === 'model') {
+                    additionalButtons = `
+                        <div class="model-input-options" style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                            <button type="button" class="btn" id="unknown-model-btn" style="
+                                background-color: #dc3545; 
+                                color: white; 
+                                border: none; 
+                                padding: 10px 20px; 
+                                border-radius: 25px; 
+                                font-size: 14px;
+                                font-weight: 500;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                min-width: 100px;
+                            " onmouseover="this.style.backgroundColor='#c82333'; this.style.transform='translateY(-1px)'" 
+                               onmouseout="this.style.backgroundColor='#dc3545'; this.style.transform='translateY(0)'">
+                                Ngga Tau
+                            </button>
+                            <button type="submit" class="btn" style="
+                                background-color: #007bff; 
+                                color: white; 
+                                border: none; 
+                                padding: 10px 20px; 
+                                border-radius: 25px; 
+                                font-size: 14px;
+                                font-weight: 500;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                min-width: 100px;
+                            " onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='translateY(-1px)'" 
+                               onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='translateY(0)'">
+                                Kirim Data
+                            </button>
+                        </div>`;
                 }
                 
                 chatFormFields.innerHTML = `
                     <input type="hidden" name="input_type" value="${inputType}">
                     ${inputHTML}
+                    ${additionalButtons}
                 `;
                 chatInputArea.style.display = 'block';
+                
+                // Hide/show default submit button based on input type
+                const defaultSubmitBtn = document.getElementById('default-submit-btn');
+                if (inputType === 'model') {
+                    // For model input, hide default button since we have custom buttons
+                    defaultSubmitBtn.style.display = 'none';
+                } else {
+                    // For other inputs, show default button
+                    defaultSubmitBtn.style.display = 'block';
+                }
+                
+                // If brand dropdown, fetch brands from API
+                if (inputType === 'brand') {
+                    fetchBrands();
+                }
+                
+                // Add event listener for "Ngga Tau" button if this is model input
+                if (inputType === 'model') {
+                    const unknownBtn = document.getElementById('unknown-model-btn');
+                    if (unknownBtn) {
+                        unknownBtn.addEventListener('click', function() {
+                            // Open YouTube link in new tab
+                            window.open('https://www.youtube.com/watch?v=XpgJ8GNt030&t=4s', '_blank');
+                            
+                            // Add a bot message explaining what to do
+                            addBotMessage('Saya sudah membuka video tutorial untuk membantu Anda menemukan type laptop. Setelah menonton, silakan kembali dan masukkan type laptop Anda.');
+                        });
+                    }
+                }
+            }
+
+            // Function to fetch brands from database
+            async function fetchBrands() {
+                try {
+                    const response = await fetch('{{ route("front.api.brands") }}');
+                    const result = await response.json();
+                    
+                    const brandSelect = document.getElementById('chat-brand');
+                    
+                    if (result.success && result.data) {
+                        brandSelect.innerHTML = '<option value="">Pilih merek laptop Anda</option>';
+                        
+                        result.data.forEach(brand => {
+                            brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
+                        });
+                        
+                        // Add "Lainnya" option
+                        brandSelect.innerHTML += '<option value="Lainnya">Lainnya</option>';
+                    } else {
+                        // Fallback to default brands
+                        brandSelect.innerHTML = `
+                            <option value="">Pilih merek laptop Anda</option>
+                            <option value="Asus">Asus</option>
+                            <option value="Acer">Acer</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="HP">HP</option>
+                            <option value="Dell">Dell</option>
+                            <option value="Toshiba">Toshiba</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Apple">Apple (MacBook)</option>
+                            <option value="MSI">MSI</option>
+                            <option value="Alienware">Alienware</option>
+                            <option value="Lainnya">Lainnya</option>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Error fetching brands:', error);
+                    // Fallback to default brands on error
+                    const brandSelect = document.getElementById('chat-brand');
+                    brandSelect.innerHTML = `
+                        <option value="">Pilih merek laptop Anda</option>
+                        <option value="Asus">Asus</option>
+                        <option value="Acer">Acer</option>
+                        <option value="Lenovo">Lenovo</option>
+                        <option value="HP">HP</option>
+                        <option value="Dell">Dell</option>
+                        <option value="Toshiba">Toshiba</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Apple">Apple (MacBook)</option>
+                        <option value="MSI">MSI</option>
+                        <option value="Alienware">Alienware</option>
+                        <option value="Lainnya">Lainnya</option>
+                    `;
+                }
             }
 
             chatDataForm.onsubmit = function(e) {
                 e.preventDefault();
                 const fd = new FormData(chatDataForm);
                 const inputType = fd.get('input_type');
-                const value = document.getElementById(`chat-${inputType}`).value.trim();
+                let value;
+                
+                // Handle different input types
+                if (inputType === 'brand') {
+                    value = document.getElementById(`chat-${inputType}`).value;
+                } else {
+                    value = document.getElementById(`chat-${inputType}`).value.trim();
+                }
                 
                 if (!value) {
                     alert('Form wajib diisi!');
@@ -929,6 +1320,9 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 }
                 
                 userInputs[inputType] = value;
+                
+                // Save state after user input
+                saveChatState();
                 
                 // Add user message
                 addUserMessage(value);
@@ -942,77 +1336,326 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
 
             function continueConversation(lastInput) {
                 setTimeout(() => {
-                    if (lastInput === 'complaint') {
-                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
-                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
-                        addBotMessage(`Apa ${deviceType} masih menyala?`, true, [
-                            {text: 'Ya', action: 'condition_yes'},
-                            {text: 'Tidak', action: 'condition_no'}
+                    if (lastInput === 'reported_issue') {
+                        addBotMessage('Wah, saya paham situasinya. Sekarang laptop Anda kondisinya bagaimana?', true, [
+                            {text: '💚 Masih Bisa Menyala Normal', action: 'laptop_on'},
+                            {text: '🟡 Menyala Tapi Ada Masalah', action: 'laptop_partially'},
+                            {text: '🔴 Tidak Bisa Menyala Sama Sekali', action: 'laptop_off'}
                         ]);
                     } else if (lastInput === 'brand') {
-                        let deviceType = userInputs.serviceType === 'service_laptop' ? 'laptop' : 
-                                       userInputs.serviceType === 'service_printer' ? 'printer' : 'komputer PC';
-                        addBotMessage(`Type berapa ${deviceType}nya?`);
-                        showInputForm('type');
-                    } else if (lastInput === 'type') {
-                        addBotMessage('Apakah ingin dijemput gratis atau datang sendiri ke store?', true, [
-                            {text: 'Iya saya mau dijemput gratis', action: 'pickup_yes'},
-                            {text: 'Tidak saya mau datang sendiri ke store', action: 'pickup_no'}
+                        addBotMessage('Good! Tipe atau seri berapa laptop Anda? Ini penting untuk persiapan spare part dan tools khusus 🔧');
+                        showInputForm('model');
+                    } 
+                    else if (lastInput === 'model') {
+                        addBotMessage('Sebelum kita lanjut, mungkin Anda tertarik dengan promo spesial kami? 🎉', true, [
+                            {text: 'Maintenance Rutin (Hemat 20%)', action: 'show_promo_maintenance'},
+                            {text: 'Voucher Perusahaan', action: 'show_promo_corporate'},
+                            {text: 'Tidak, Lanjut Aja', action: 'continue_to_name'}
                         ]);
+
                     } else if (lastInput === 'name') {
-                        addBotMessage(`Oke kak ${userInputs.name}, nomor telepon/WhatsApp berapa?`);
+                        addBotMessage(`Hai ${userInputs.name}! Senang bisa bantu Anda hari ini 😊\n\nNomor WhatsApp berapa yang aktif untuk koordinasi nanti?`);
                         showInputForm('phone');
                     } else if (lastInput === 'phone') {
-                        if (userInputs.pickup === 'yes') {
-                            addBotMessage('Untuk alamat lengkapnya dimana?');
-                            showInputForm('address');
-                        } else {
-                            generateFinalWhatsAppMessage();
-                        }
-                    } else if (lastInput === 'address') {
-                        generateFinalWhatsAppMessage();
+                        addBotMessage('Mantap! Workshop kami buka setiap hari jam 08.00-20.00. Alamat ada di Google Maps dengan nama "LaptopService". \n\nSebentar ya, saya buatkan ringkasan ordernya...');
+                        
+                        // Generate nota number and save to database after phone input
+                        setTimeout(async () => {
+                            try {
+                                console.log('Saving data to database after phone input...');
+                                const saveResult = await saveChatbotDataToDatabase();
+                                console.log('Database save result:', saveResult);
+                                
+                                if (saveResult.success && saveResult.nota_number) {
+                                    userInputs.notaNumber = saveResult.nota_number;
+                                    addBotMessage(`✅ Data Anda berhasil tersimpan!\n\n📋 **Nomor Nota: ${saveResult.nota_number}**\n\nSimpan nomor nota ini untuk melacak status pengerjaan laptop Anda.`);
+                                    
+                                    // Continue with final message generation
+                                    setTimeout(async () => {
+                                        await generateFinalWhatsAppMessage();
+                                    }, 2000);
+                                } else {
+                                    console.error('Database save failed:', saveResult.message);
+                                    // Still continue with final message even if save fails
+                                    await generateFinalWhatsAppMessage();
+                                }
+                            } catch (error) {
+                                console.error('Error during database save:', error);
+                                // Still continue with final message even if save fails
+                                await generateFinalWhatsAppMessage();
+                            }
+                        }, 2000);
                     }
                 }, 1000);
             }
 
-            function generateFinalWhatsAppMessage() {
+            // Debug function to test database save manually
+            async function testDatabaseSave() {
+                console.log('Testing database save with userInputs:', userInputs);
+                const result = await saveChatbotDataToDatabase();
+                console.log('Database save result:', result);
+                return result;
+            }
+
+            async function generateFinalWhatsAppMessage() {
+                console.log('=== generateFinalWhatsAppMessage started ===');
+                console.log('Current userInputs:', userInputs);
+                
                 let message = '';
-                let deviceType = userInputs.serviceType === 'service_laptop' ? 'Laptop' : 
-                                userInputs.serviceType === 'service_printer' ? 'Printer' : 'Komputer PC';
                 
-                message = `*PEMESANAN SERVICE ${deviceType.toUpperCase()}*\n\n`;
-                message += `*Nama:* ${userInputs.name}\n`;
-                message += `*WhatsApp:* ${userInputs.phone}\n`;
-                message += `*Merek:* ${userInputs.brand}\n`;
-                message += `*Type:* ${userInputs.type}\n`;
-                message += `*Keluhan:* ${userInputs.complaint}\n`;
-                message += `*Kondisi:* ${userInputs.condition}\n`;
-                message += `*Dijemput:* ${userInputs.pickup === 'yes' ? 'Ya' : 'Tidak'}\n`;
-                
-                if (userInputs.pickup === 'yes' && userInputs.address) {
-                    message += `*Alamat:* ${userInputs.address}\n`;
+                // Header based on service type
+                if (userInputs.serviceType === 'maintenance') {
+                    message = `*BOOKING MAINTENANCE RUTIN (HEMAT 20%)*\n\n`;
+                } else if (userInputs.serviceType === 'corporate') {
+                    message = `*KONSULTASI LAYANAN CORPORATE*\n\n`;
+                } else {
+                    message = `*PEMESANAN SERVICE LAPTOP*\n\n`;
                 }
                 
-                message += `\nMohon konfirmasi dan estimasi biaya. Terima kasih!`;
+                message += `*Nama:* ${userInputs.name}\n`;
+                message += `*WhatsApp:* ${userInputs.phone}\n`;
+                message += `*Merek Laptop:* ${userInputs.brand}\n`;
+                message += `*Model/Type:* ${userInputs.model}\n`;
+                message += `*Keluhan:* ${userInputs.reported_issue}\n`;
                 
-                addBotMessage('Terima kasih! Data sudah lengkap. Silakan klik tombol di bawah untuk mengirim ke WhatsApp.', true, [
-                    {text: '📱 Kirim ke WhatsApp', action: 'send_whatsapp'}
+                if (userInputs.condition) {
+                    message += `*Kondisi Saat Ini:* ${userInputs.condition}\n`;
+                }
+                
+                // Add promo section based on service type
+                if (userInputs.serviceType === 'maintenance') {
+                    message += `\n*PROMO MAINTENANCE RUTIN YANG DIPILIH:*\n`;
+                    message += `- Hemat hingga 20% untuk perawatan berkala\n`;
+                    message += `- Pembersihan menyeluruh sistem\n`;
+                    message += `- Update software terbaru\n`;
+                    message += `- Optimasi performa\n`;
+                    message += `- Garansi layanan 30 hari\n`;
+                    message += `*Promo ini berlaku untuk kunjungan ke-2 dan seterusnya*\n`;
+                } else if (userInputs.serviceType === 'corporate') {
+                    message += `\n*PAKET CORPORATE YANG DIMINATI:*\n`;
+                    message += `- Layanan on-site gratis\n`;
+                    message += `- Harga khusus untuk bulk service\n`;
+                    message += `- Support teknis 24/7\n`;
+                    message += `- Maintenance kontrak tahunan\n`;
+                    message += `*Tim corporate kami akan segera menghubungi untuk penawaran khusus*\n`;
+                } else {
+                    message += `\n*LAYANAN REGULAR SERVICE*\n`;
+                    message += `- Teknisi berpengalaman\n`;
+                    message += `- Sparepart original\n`;
+                    message += `- Garansi service\n`;
+                    message += `- Gratis cek & konsultasi`;
+                }
+                
+                // Add nota number BEFORE confirmation message if available
+                if (userInputs.notaNumber) {
+                    message += `\n\n*NOMOR NOTA: ${userInputs.notaNumber}*\n`;
+                    message += `_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_\n`;
+                }
+                
+                message += `\n_Mohon konfirmasi untuk memproses order Anda. Tim kami akan segera menghubungi untuk koordinasi lebih lanjut. Terima kasih!_`;
+                
+                addBotMessage('Sempurna! Saya sudah siapkan ringkasan ordernya dengan estimasi berdasarkan kondisi laptop Anda', true, [
+                    {text: 'Kirim ke WhatsApp', action: 'send_whatsapp'},
+                    {text: 'Copy Pesan', action: 'copy_message'}
                 ]);
                 
                 // Store message for WhatsApp
                 userInputs.finalMessage = message;
             }
 
-            function sendToWhatsApp(message) {
+            async function sendToWhatsApp(message) {
+                console.log('=== sendToWhatsApp function called ===');
+                console.log('Input message parameter:', message);
+                console.log('userInputs with nota:', JSON.stringify(userInputs, null, 2));
+                
+                // Add a visual indicator that the function is working
+                const buttons = document.querySelectorAll('.chat-btn');
+                buttons.forEach(btn => {
+                    if (btn.textContent.includes('Kirim ke WhatsApp')) {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Membuka WhatsApp...';
+                        btn.disabled = true;
+                    }
+                });
+                
+                // No need to save database again, already saved after phone input
+                // Proceed directly to WhatsApp
+                console.log('Calling proceedToWhatsApp...');
+                proceedToWhatsApp(message);
+            }
+            
+            function proceedToWhatsApp(message) {
+                console.log('=== proceedToWhatsApp function called ===');
+                console.log('Input message:', message);
+                console.log('userInputs.finalMessage:', userInputs.finalMessage);
+                console.log('userInputs.notaNumber:', userInputs.notaNumber);
+                
                 if (!message && userInputs.finalMessage) {
                     message = userInputs.finalMessage;
                 }
                 
+                // No need to add nota number here - already included in generateFinalWhatsAppMessage
+                
+                if (!message || message.trim() === '') {
+                    console.error('No message to send to WhatsApp!');
+                    alert('Error: Tidak ada pesan untuk dikirim ke WhatsApp');
+                    return;
+                }
+                
                 const waNumber = '6287823330830';
                 const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(message);
-                window.open(waUrl, '_blank');
-                waModal.style.display = 'none';
-                resetChat();
+                
+                console.log('Final WhatsApp message length:', message.length);
+                console.log('Final WhatsApp message:', message);
+                console.log('WhatsApp URL:', waUrl);
+                
+                // Try multiple methods to open WhatsApp in new tab
+                try {
+                    console.log('Attempting to open WhatsApp in new tab...');
+                    
+                    // Method 1: Use window.open with _blank (primary method)
+                    const newWindow = window.open(waUrl, '_blank', 'noopener,noreferrer');
+                    
+                    if (newWindow) {
+                        console.log('WhatsApp window opened successfully via window.open');
+                    } else {
+                        console.log('window.open blocked by popup blocker, trying temporary link...');
+                        // Method 2: Create and click a temporary link (fallback for popup blockers)
+                        const tempLink = document.createElement('a');
+                        tempLink.href = waUrl;
+                        tempLink.target = '_blank';
+                        tempLink.rel = 'noopener noreferrer';
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                        console.log('WhatsApp opened via temporary link');
+                    }
+                    
+                    // Reset chat after short delay
+                    setTimeout(() => {
+                        waModal.style.display = 'none';
+                        resetChat();
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error opening WhatsApp:', error);
+                    
+                    // Method 3: Final fallback - still try to open in new tab
+                    try {
+                        console.log('Trying final fallback method...');
+                        const finalLink = document.createElement('a');
+                        finalLink.href = waUrl;
+                        finalLink.target = '_blank';
+                        finalLink.rel = 'noopener noreferrer';
+                        finalLink.style.display = 'none';
+                        document.body.appendChild(finalLink);
+                        
+                        // Simulate click event
+                        const clickEvent = new MouseEvent('click', {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        finalLink.dispatchEvent(clickEvent);
+                        
+                        document.body.removeChild(finalLink);
+                        console.log('WhatsApp opened via final fallback method');
+                        
+                        // Reset chat after short delay
+                        setTimeout(() => {
+                            waModal.style.display = 'none';
+                            resetChat();
+                        }, 1000);
+                        
+                    } catch (finalError) {
+                        console.error('All methods failed:', finalError);
+                        alert('Gagal membuka WhatsApp. Silakan coba tombol "Hubungi Langsung" atau hubungi customer service manual.');
+                    }
+                }
+            }
+
+            // New function for saving chatbot data to database
+            async function saveChatbotDataToDatabase() {
+                console.log('=== saveChatbotDataToDatabase function called ===');
+                console.log('Complete userInputs object:', JSON.stringify(userInputs, null, 2));
+                
+                // Validate required data first
+                const requiredFields = ['name', 'phone', 'brand', 'model', 'reported_issue'];
+                const missingFields = requiredFields.filter(field => !userInputs[field] || userInputs[field].trim() === '');
+                
+                if (missingFields.length > 0) {
+                    console.error('Missing required data fields:', missingFields);
+                    console.error('Current userInputs state:', userInputs);
+                    return { 
+                        success: false, 
+                        message: `Data tidak lengkap. Field yang diperlukan: ${missingFields.join(', ')}` 
+                    };
+                }
+                
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    console.log('CSRF token element:', csrfToken);
+                    console.log('CSRF token value:', csrfToken ? csrfToken.getAttribute('content') : 'NOT FOUND');
+                    
+                    if (!csrfToken || !csrfToken.getAttribute('content')) {
+                        console.error('CSRF token not found or empty');
+                        return { success: false, message: 'CSRF token tidak ditemukan' };
+                    }
+
+                    // Use FormData instead of JSON to avoid CSRF issues
+                    const formData = new FormData();
+                    formData.append('_token', csrfToken.getAttribute('content')); // Laravel standard CSRF field
+                    formData.append('name', userInputs.name.trim());
+                    formData.append('phone', userInputs.phone.trim());
+                    formData.append('email', '-');
+                    formData.append('address', '-');
+                    formData.append('brand', userInputs.brand.trim());
+                    formData.append('model', userInputs.model.trim());
+                    formData.append('serial_number', '-');
+                    formData.append('reported_issue', userInputs.reported_issue.trim());
+                    formData.append('service_type', userInputs.serviceType || 'regular');
+                    formData.append('condition', userInputs.condition || '-');
+                    
+                    // Create detailed technician note based on service type
+                    let techNote = 'Pemesanan via Chatbot LASO';
+                    if (userInputs.serviceType === 'maintenance') {
+                        techNote += ' - PROMO MAINTENANCE RUTIN (Hemat 20%)';
+                    } else if (userInputs.serviceType === 'corporate') {
+                        techNote += ' - LAYANAN CORPORATE (Tim khusus akan menghubungi)';
+                    } else {
+                        techNote += ' - Service Regular';
+                    }
+                    formData.append('technician_note', techNote);
+
+                    console.log('Prepared form data for submission');
+                    console.log('CSRF token being sent:', csrfToken.getAttribute('content'));
+                    console.log('Making fetch request to:', '{{ route("front.chatbot-order.store") }}');
+
+                    const response = await fetch('{{ route("front.chatbot-order.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Response error:', errorText);
+                        return { success: false, message: `Server error: ${response.status}` };
+                    }
+                    
+                    const result = await response.json();
+                    console.log('Response result:', result);
+                    return result;
+
+                } catch (error) {
+                    console.error('Error saving to database:', error);
+                    return { success: false, message: error.message };
+                }
             }
 
             function scrollToBottom() {
@@ -1025,12 +1668,37 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 messagesContainer.innerHTML = '';
                 chatInputArea.style.display = 'none';
                 chatDataForm.reset();
+                // Clear localStorage when manually resetting
+                clearChatState();
             }
-
-            // Handle send WhatsApp action
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.chat-option-btn') && e.target.textContent.includes('Kirim ke WhatsApp')) {
-                    sendToWhatsApp();
+            
+            // Add manual reset button functionality (optional)
+            function manualResetChat() {
+                resetChat();
+                // Re-initialize with fresh state
+                setTimeout(() => {
+                    addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
+                    setTimeout(() => {
+                        addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
+                            {text: 'Service Laptop', action: 'service_laptop'},
+                            {text: 'Hubungi Langsung', action: 'direct_contact'}
+                        ]);
+                    }, 1500);
+                }, 500);
+            }
+            
+            // Detect page refresh and clear state
+            window.addEventListener('beforeunload', function() {
+                // Set a flag that we're refreshing
+                sessionStorage.setItem('page_refreshing', 'true');
+            });
+            
+            // Check if page was refreshed on load
+            window.addEventListener('load', function() {
+                if (sessionStorage.getItem('page_refreshing')) {
+                    // Page was refreshed, clear chat state
+                    clearChatState();
+                    sessionStorage.removeItem('page_refreshing');
                 }
             });
         });

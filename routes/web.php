@@ -22,9 +22,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['as' => 'front.'], function () {
     Route::get('/', FrontHomeController::class)->name('home');
+
+    Route::get('/cek-status', [FrontHomeController::class, 'cekStatus'])->name('cek-status');
+
     
     // Service Order Routes
     Route::post('/service-order', [ServiceOrderController::class, 'store'])->name('service-order.store');
+    
+    // Chatbot API Routes
+    Route::post('/chatbot-order', [ServiceOrderController::class, 'storeChatbot'])->name('chatbot-order.store');
+    Route::get('/api/brands', [ServiceOrderController::class, 'getBrands'])->name('api.brands');
+    Route::post('/klik-wa', [ServiceOrderController::class, 'klikWa'])->name('klik-wa');
 
 });
 

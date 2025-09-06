@@ -1,0 +1,230 @@
+/* Hero Section */
+#hero {
+    min-height: 100vh; 
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-top: 80px; 
+    padding-bottom: 80px; 
+    
+    background-color: #FBFCFD;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+#hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-img {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+}
+
+.input-group .btn-primary {
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Smooth scroll for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+/* End Hero Section */
+
+/* Kartu Hasil Lacak */
+#hasil {
+    background-color: #FBFCFD;
+    padding-top: 40px; /* Reduced from 80px */
+    padding-bottom: 80px;
+}
+.result-card {
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}   
+
+.result-card .detail-section {
+    margin-top: 15px;
+    font-size: 18px;
+    color: var(--navy);
+}
+.result-card .detail-section strong {
+    display: block;
+    margin-bottom: 5px;
+}
+.result-card .detail-section p {
+    margin: 0;
+    color: var(--navy);
+}
+
+/* Status Badge Styling - Same as Admin Panel */
+.status-badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    align-self: center; /* Center vertically in flex container */
+}
+
+/* Status Colors - Same as Admin Panel */
+.status-badge.bg-success {
+    color: #fff;
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.status-badge.bg-warning {
+    color: #000;
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.status-badge.bg-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Result Card Header Layout */
+.result-card .d-flex {
+    align-items: center; /* Center content vertically */
+    gap: 1rem; /* Add spacing between elements */
+}
+
+.result-card .d-flex > div:first-child {
+    flex: 1; /* Take up remaining space */
+}
+
+/* End Kartu Hasil Lacak */
+
+
+
+
+/* Animasi Scroll */
+/* State awal elemen sebelum animasi */
+.animate-on-scroll {
+    opacity: 0;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* State awal untuk animasi fade-in-up */
+.fade-in-up {
+    transform: translateY(30px);
+}
+
+/* State awal untuk animasi fade-in-left */
+.fade-in-left {
+    transform: translateX(-30px);
+}
+
+/* State awal untuk animasi fade-in-right */
+.fade-in-right {
+    transform: translateX(30px);
+}
+
+/* State akhir (saat .is-visible ditambahkan oleh JS) */
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Untuk efek staggered (muncul satu per satu) */
+.delay-1 { transition-delay: 100ms; }
+.delay-2 { transition-delay: 200ms; }
+.delay-3 { transition-delay: 300ms; }
+/* End Animasi Scroll */
+
+/* Responsif */
+@media (max-width: 991.98px) {
+    #hero {
+        padding-top: 70px;
+        padding-bottom: 70px;
+    }
+    #hero .row {
+        text-align: center; 
+    }
+    
+    .hero-img {
+        width: 60%;
+        margin-top: 30px;
+    }
+
+    .result-card {
+        padding: 24px;
+    }
+    
+    #hasil {
+        padding-top: 30px; /* Reduced for mobile */
+    }
+}
+
+@media (max-width: 767.98px) {
+    #hero {
+        padding-top: 100px;
+        padding-bottom: 80px;
+    }
+
+    .header-1 {
+        font-size: 28px; 
+    }
+
+    .body-1 {
+        font-size: 16px;
+    }
+    .hero-img {
+        width: 70%;
+    }
+    .input-group .form-control-lg {
+        font-size: 16px;
+    }
+    .input-group .btn-primary {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    /* Hasil Lacak */
+    .col-lg-12 h2 {
+        font-size: 24px;
+    }
+    .result-card {
+        padding: 20px 15px;
+    }
+    .result-card .d-flex {
+        font-size: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .result-card .d-flex h5{
+        font-size: 20px;
+    }
+    .result-card .status-badge {
+        margin-top: 0;
+        align-self: flex-start; /* Align to start on mobile */
+    }
+    .result-card .detail-section strong {
+        font-size: 16px;
+    }
+    .result-card .detail-section p {
+        font-size: 16px;
+    }
+    /* End Hasil Lacak */
+}
+/* End Responsif */

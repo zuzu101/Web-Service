@@ -109,4 +109,116 @@ class ServiceOrderController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get brands for chatbot dropdown
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBrands()
+    {
+        try {
+            $brands = DeviceRepair::select('brand')
+                ->distinct()
+                ->whereNotNull('brand')
+                ->where('brand', '!=', '')
+                ->orderBy('brand')
+                ->pluck('brand');
+
+            return response()->json([
+                'success' => true,
+                'data' => $brands
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data merek',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Store service order from chatbot
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeChatbot(Request $request)
+    {
+        try {
+            // Validate chatbot specific fields
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|max:20',
+                'brand' => 'required|string|max:255',
+                'model' => 'required|string|max:255',
+                'reported_issue' => 'required|string'
+            ]);
+
+            DB::beginTransaction();
+
+            // Create customer from chatbot data (using phone as identifier)
+            // For chatbot, we'll always create new customer record to avoid conflicts
+            $customer = Customers::create([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'email' => $request->email ?? '-', // No unique constraint now
+                'address' => $request->address ?? '-',
+                'status' => 1,
+            ]);
+
+            // Generate nota number
+            $latestNota = DeviceRepair::latest('id')->first();
+            $nextNumber = $latestNota ? $latestNota->id + 1 : 1;
+            $notaNumber = 'NOTA-' . date('Ym') . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+            // Create device repair record
+            DeviceRepair::create([
+                'nota_number' => $notaNumber,
+                'customer_id' => $customer->id,
+                'brand' => $request->brand,
+                'model' => $request->model,
+                'serial_number' => $request->serial_number ?? '-',
+                'reported_issue' => $request->reported_issue,
+                'technician_note' => $request->technician_note ?? 'Pemesanan via Chatbot LASO',
+                'status' => 'Perangkat Baru Masuk',
+                'price' => null,
+                'complete_in' => null,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan ke database!',
+                'nota_number' => $notaNumber
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle chatbot WhatsApp click tracking
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function klikWa(Request $request)
+    {
+        // Simple endpoint for tracking WhatsApp clicks
+        // You can add analytics or logging here if needed
+        return response()->json([
+            'success' => true,
+            'message' => 'WhatsApp click tracked'
+        ]);
+    }
 }

@@ -689,6 +689,98 @@
     color: #fff; 
     font-size: 1.3rem; 
     cursor: pointer; 
+    transition: transform 0.2s ease;
+}
+
+#wa-chatbot-close:hover {
+    transform: scale(1.1);
+}
+
+/* Chatbot Animation Improvements */
+.chat-message {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Better Button Styling for Model Input */
+.model-input-options {
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+.model-input-options button {
+    position: relative;
+    overflow: hidden;
+}
+
+.model-input-options button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.model-input-options button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Enhanced WhatsApp Float Button */
+#wa-float-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+#wa-float-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+}
+
+#wa-float-btn:active {
+    transform: scale(0.95);
+}
+
+/* Chatbot Modal Animation */
+#wa-chatbot-modal {
+    z-index: 9999 !important;
+    transform-origin: bottom right;
+}
+
+.chat-input-form {
+    background: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Ensure proper scrolling */
+#wa-chatbot-messages {
+    scroll-behavior: smooth;
+}
+
+/* Loading animation for better UX */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
 }
 
 /* WhatsApp Chatbot Responsive */

@@ -175,15 +175,15 @@
     
 
     <div class="price-section">
-        <div class="info-row">
-            <span class="label">Harga:</span>
-            <span class="value">{{ $deviceRepair->price ? 'Rp.' . number_format($deviceRepair->price, 0, ',', '.') : 'Belum ditentukan' }}</span>
-        </div>
         
         @if(isset($paidAmount) && $paidAmount > 0)
         <div class="info-row">
             <span class="label">Bayar:</span>
             <span class="value">Rp.{{ number_format($paidAmount, 0, ',', '.') }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Harga:</span>
+            <span class="value">{{ $deviceRepair->price ? 'Rp.' . number_format($deviceRepair->price, 0, ',', '.') : 'Belum ditentukan' }}</span>
         </div>
         <div class="info-row" style="border-bottom: 1px dashed #000; line-height: 1;"></div>
         @if(isset($change) && $change > 0)
@@ -192,6 +192,7 @@
             <span class="value">Rp.{{ number_format($change, 0, ',', '.') }}</span>
         </div>
         @endif
+        <br>
         <div class="total-price">
             <strong>STATUS: LUNAS</strong>
         </div>

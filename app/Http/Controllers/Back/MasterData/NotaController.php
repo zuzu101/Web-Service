@@ -7,6 +7,7 @@ use App\Http\Requests\MasterData\NotaRequest;
 use App\Models\MasterData\DeviceRepair;
 use App\Services\MasterData\NotaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class NotaController extends Controller
@@ -39,14 +40,15 @@ class NotaController extends Controller
     /**
      * Print nota (thermal print view)
      */
-    public function print($id, Request $request = null)
+    public function print($id, Request $request)
     {
         $deviceRepair = $this->notaService->getNotaData($id);
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
         
-        // Get payment info from request (support both GET and POST)
-        $paidAmount = $request ? $request->get('paid_amount', 0) : 0;
-        $change = max(0, $paidAmount - ($deviceRepair->price ?? 0));
+        // Get payment info from request (POST data)
+        $paidAmount = floatval($request->input('paid_amount', 0));
+        $devicePrice = floatval($deviceRepair->price ?? 0);
+        $change = max(0, $paidAmount - $devicePrice);
 
         return view('back.MasterData.Nota.print', compact('deviceRepair', 'notaNumber', 'paidAmount', 'change'));
     }
@@ -54,14 +56,15 @@ class NotaController extends Controller
     /**
      * Generate PDF nota
      */
-    public function pdf($id, Request $request = null)
+    public function pdf($id, Request $request)
     {
         $deviceRepair = $this->notaService->getNotaData($id);
         $notaNumber = $this->notaService->generateNotaNumber($deviceRepair);
         
-        // Get payment info from request (support both GET and POST)
-        $paidAmount = $request ? $request->get('paid_amount', 0) : 0;
-        $change = max(0, $paidAmount - ($deviceRepair->price ?? 0));
+        // Get payment info from request (POST data)
+        $paidAmount = floatval($request->input('paid_amount', 0));
+        $devicePrice = floatval($deviceRepair->price ?? 0);
+        $change = max(0, $paidAmount - $devicePrice);
         
         $pdf = Pdf::loadView('back.MasterData.Nota.pdf', compact('deviceRepair', 'notaNumber', 'paidAmount', 'change'));
         $pdf->setPaper([0,0,165.025984252, 9321.122834646], 'portrait');

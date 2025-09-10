@@ -175,6 +175,7 @@
     
 
     <div class="price-section">
+        
         @if(isset($paidAmount) && $paidAmount > 0)
         <div class="info-row">
             <span class="label">Bayar:</span>
@@ -191,9 +192,13 @@
             <span class="value">Rp.{{ number_format($change, 0, ',', '.') }}</span>
         </div>
         @endif
-        <div class="sign-line"></div>
+        <br>
         <div class="total-price">
             <strong>STATUS: LUNAS</strong>
+        </div>
+        @else
+        <div class="total-price">
+            <strong>STATUS: BELUM LUNAS</strong>
         </div>
         @endif
     </div>

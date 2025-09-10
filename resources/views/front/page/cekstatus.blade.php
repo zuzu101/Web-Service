@@ -124,21 +124,6 @@
 
             const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
             elementsToAnimate.forEach((el) => observer.observe(el));
-            
-            // Auto scroll to results if search was performed
-            @if($searched)
-                window.addEventListener('load', function() {
-                    setTimeout(function() {
-                        const resultsSection = document.getElementById('hasil');
-                        if (resultsSection) {
-                            resultsSection.scrollIntoView({ 
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
-                        }
-                    }, 500); // Small delay to ensure page is fully loaded
-                });
-            @endif
         </script>
     @endpush
     

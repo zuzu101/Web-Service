@@ -33,17 +33,12 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-
-/* Smooth scroll for anchor links */
-html {
-    scroll-behavior: smooth;
-}
 /* End Hero Section */
 
 /* Kartu Hasil Lacak */
 #hasil {
     background-color: #FBFCFD;
-    padding-top: 40px; /* Reduced from 80px */
+    padding-top: 80px;
     padding-bottom: 80px;
 }
 .result-card {
@@ -167,10 +162,6 @@ html {
 
     .result-card {
         padding: 24px;
-    }
-    
-    #hasil {
-        padding-top: 30px; /* Reduced for mobile */
     }
 }
 

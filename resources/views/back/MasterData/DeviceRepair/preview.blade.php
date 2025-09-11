@@ -1,5 +1,9 @@
 @extends('layouts.admin.app')
 
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('header')
     <header class="container-fluid">
         <div class="row mb-2">
@@ -67,6 +71,47 @@
                 <label>Harga</label>
                 <input type="text" value="Rp. {{ number_format($deviceRepair->price, 0, ',', '.') }}" class="form-control" readonly>
             </div>
+            <div class="form-group">
+                <label>Metode Pembayaran</label>
+                <input type="text" value="{{ $deviceRepair->payment_method ? ucfirst($deviceRepair->payment_method) : 'Belum ditentukan' }}" class="form-control" readonly>
+            </div>
+            @if($deviceRepair->payment_method === 'transfer' && $deviceRepair->transfer_proof)
+            <div class="form-group">
+                <label>Bukti Transfer</label>
+                @php
+                    $fileExtension = pathinfo($deviceRepair->transfer_proof, PATHINFO_EXTENSION);
+                    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    $isImage = in_array(strtolower($fileExtension), $imageExtensions);
+                @endphp
+                
+                @if($isImage)
+                    <div class="text-center">
+                        <img src="{{ Storage::url($deviceRepair->transfer_proof) }}" 
+                             alt="Bukti Transfer" 
+                             class="img-fluid rounded border" 
+                             style="max-width: 400px; max-height: 300px; object-fit: contain;"
+                             onclick="window.open(this.src, '_blank')">
+                        <div class="mt-2">
+                            <small class="text-muted">Klik gambar untuk melihat ukuran penuh</small>
+                        </div>
+                    </div>
+                @else
+                    <div class="input-group">
+                        <input type="text" value="File PDF tersedia" class="form-control" readonly>
+                        <div class="input-group-append">
+                            <a href="{{ Storage::url($deviceRepair->transfer_proof) }}" target="_blank" class="btn btn-outline-info">
+                                <i class="fa fa-file-pdf"></i> Lihat PDF
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            @elseif($deviceRepair->payment_method === 'transfer')
+            <div class="form-group">
+                <label>Bukti Transfer</label>
+                <input type="text" value="Belum diupload" class="form-control" readonly>
+            </div>
+            @endif
             <div class="form-group">
                 <label>Tanggal Masuk</label>
                 <input type="text" value="{{ $deviceRepair->created_at->format('d M Y H:i') }}" class="form-control" readonly>

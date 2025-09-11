@@ -29,18 +29,43 @@
                 <div class="form-group">
                     <label for="customer_id">Pelanggan</label>
                     <select name="customer_id" id="customer_id" class="form-control select2" required>
-                        <option value=""></option>
+                        <option value="">Pilih pelanggan atau ketik nama baru...</option>
                         @foreach(\App\Models\MasterData\Customers::all() as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                            <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>{{ $customer->name }}</option>
                         @endforeach
-
                     </select>
+                    <small class="form-text text-muted">
+                        Pilih dari daftar pelanggan yang sudah ada, atau ketik nama baru untuk menambah pelanggan baru.
+                    </small>
                 </div>
 
                 {{-- Merk Laptop --}}
                 <div class="form-group">
                     <label for="brand">Merk Laptop</label>
-                    <input type="text" name="brand" class="form-control" placeholder="Cth: Asus, Lenovo, HP" required>
+                    <select name="brand" id="brand" class="form-control select2" required>
+                        <option value="">Pilih merk laptop...</option>
+                        @if(isset($brands) && $brands->count())
+                            @foreach($brands as $brandOption)
+                                <option value="{{ $brandOption }}" {{ old('brand') == $brandOption ? 'selected' : '' }}>{{ $brandOption }}</option>
+                            @endforeach
+                        @else
+                            {{-- Fallback brands jika database kosong --}}
+                            <option value="Asus">Asus</option>
+                            <option value="Acer">Acer</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="HP">HP</option>
+                            <option value="Dell">Dell</option>
+                            <option value="Toshiba">Toshiba</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Apple">Apple (MacBook)</option>
+                            <option value="MSI">MSI</option>
+                            <option value="Alienware">Alienware</option>
+                        @endif
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Pilih merk dari daftar atau ketik merk baru untuk menambahkannya ke database.
+                    </small>
                 </div>
 
                 {{-- Model --}}
@@ -94,6 +119,25 @@
                     <label for="complete_in">Target Selesai</label>
                     <input type="date" name="complete_in" class="form-control">
                 </div>
+
+                {{-- Payment Method --}}
+                <div class="form-group">
+                    <label for="payment_method">Metode Pembayaran</label>
+                    <select name="payment_method" id="payment_method" class="form-control" required>
+                        <option value="">Pilih metode pembayaran...</option>
+                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                        <option value="transfer" {{ old('payment_method') == 'transfer' ? 'selected' : '' }}>Transfer</option>
+                    </select>
+                </div>
+
+                {{-- Transfer Proof (Only show when transfer is selected) --}}
+                <div class="form-group" id="transfer_proof_group" style="display: none;">
+                    <label for="transfer_proof">Bukti Transfer</label>
+                    <input type="file" name="transfer_proof" id="transfer_proof" class="form-control-file" accept="image/*,.pdf">
+                    <small class="form-text text-muted">
+                        Upload bukti transfer (gambar atau PDF). Maksimal 2MB.
+                    </small>
+                </div>
                 
                 {{-- Buttons --}}
                 <div class="mt-4">
@@ -118,7 +162,51 @@
             placeholder: 'Ketik nama pelanggan...',
             allowClear: true,
             width: '100%',
-            theme: 'bootstrap-4'
+            theme: 'bootstrap-4',
+            tags: true, // Allow creating new options
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') {
+                    return null;
+                }
+                return {
+                    id: 'new:' + term, // Prefix with 'new:' to identify new customers
+                    text: term + ' (Pelanggan Baru)',
+                    newTag: true
+                };
+            },
+            templateResult: function (data) {
+                if (data.newTag) {
+                    return $('<span><i class="fa fa-plus-circle text-success"></i> ' + data.text + '</span>');
+                }
+                return data.text;
+            }
+        });
+
+        // Initialize Select2 for brand field
+        $('#brand').select2({
+            placeholder: 'Pilih merk laptop...',
+            allowClear: true,
+            width: '100%',
+            theme: 'bootstrap-4',
+            tags: true, // Allow creating new options
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') {
+                    return null;
+                }
+                return {
+                    id: term,
+                    text: term + ' (Merk Baru)',
+                    newTag: true
+                };
+            },
+            templateResult: function (data) {
+                if (data.newTag) {
+                    return $('<span><i class="fa fa-plus-circle text-success"></i> ' + data.text + '</span>');
+                }
+                return data.text;
+            }
         });
 
         // Format currency input
@@ -151,6 +239,23 @@
             if (!raw) return true;
             return Number(raw) <= Number(param);
         });
+
+        // Handle payment method change
+        $('#payment_method').on('change', function() {
+            if ($(this).val() === 'transfer') {
+                $('#transfer_proof_group').slideDown();
+                $('#transfer_proof').attr('required', true);
+            } else {
+                $('#transfer_proof_group').slideUp();
+                $('#transfer_proof').removeAttr('required').val('');
+            }
+        });
+
+        // Show transfer proof field if transfer was selected (for validation errors)
+        if ($('#payment_method').val() === 'transfer') {
+            $('#transfer_proof_group').show();
+            $('#transfer_proof').attr('required', true);
+        }
 
         $('#form-validation').validate({
             rules: {

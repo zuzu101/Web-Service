@@ -33,7 +33,15 @@ class DeviceRepairController extends Controller
      */
     public function create()
     {
-        return view('back.MasterData.DeviceRepair.create');
+        // Ambil semua brands yang sudah ada di database
+        $brands = DeviceRepair::select('brand')
+            ->distinct()
+            ->whereNotNull('brand')
+            ->where('brand', '!=', '')
+            ->orderBy('brand')
+            ->pluck('brand');
+
+        return view('back.MasterData.DeviceRepair.create', compact('brands'));
     }
 
     /**
@@ -57,7 +65,15 @@ class DeviceRepairController extends Controller
      */
     public function edit(DeviceRepair $deviceRepair)
     {
-        return view('back.MasterData.DeviceRepair.edit', compact('deviceRepair'));
+        // Ambil semua brands yang sudah ada di database
+        $brands = DeviceRepair::select('brand')
+            ->distinct()
+            ->whereNotNull('brand')
+            ->where('brand', '!=', '')
+            ->orderBy('brand')
+            ->pluck('brand');
+
+        return view('back.MasterData.DeviceRepair.edit', compact('deviceRepair', 'brands'));
     }
 
     /**

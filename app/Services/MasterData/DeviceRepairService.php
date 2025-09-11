@@ -6,6 +6,7 @@ use App\Helpers\ErrorHandling;
 use App\Helpers\ImageHelpers;
 use App\Http\Requests\MasterData\DeviceRepairRequest;
 use App\Models\MasterData\DeviceRepair;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class DeviceRepairService
@@ -19,7 +20,32 @@ class DeviceRepairService
         $request->validated();
 
         try {
-            DeviceRepair::create($request->all());
+            $data = $request->all();
+            
+            // Handle new customer creation
+            if (isset($data['customer_id']) && strpos($data['customer_id'], 'new:') === 0) {
+                $customerName = substr($data['customer_id'], 4); // Remove 'new:' prefix
+                
+                // Create new customer with minimal data
+                $customer = \App\Models\MasterData\Customers::create([
+                    'name' => $customerName,
+                    'phone' => '', // Will be updated later if needed
+                    'address' => '', // Will be updated later if needed
+                    'status' => 1 // Active by default
+                ]);
+                
+                $data['customer_id'] = $customer->id;
+            }
+            
+            // Handle transfer proof file upload
+            if ($request->hasFile('transfer_proof')) {
+                $file = $request->file('transfer_proof');
+                $filename = 'transfer_proof_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('transfer_proofs', $filename, 'public');
+                $data['transfer_proof'] = $path;
+            }
+            
+            DeviceRepair::create($data);
         } catch (\Error $e) {
             ErrorHandling::environmentErrorHandling($e->getMessage());
         }
@@ -30,7 +56,37 @@ class DeviceRepairService
         $request->validated();
 
         try {
-            $deviceRepair->update($request->all());
+            $data = $request->all();
+            
+            // Handle new customer creation
+            if (isset($data['customer_id']) && strpos($data['customer_id'], 'new:') === 0) {
+                $customerName = substr($data['customer_id'], 4); // Remove 'new:' prefix
+                
+                // Create new customer with minimal data
+                $customer = \App\Models\MasterData\Customers::create([
+                    'name' => $customerName,
+                    'phone' => '', // Will be updated later if needed
+                    'address' => '', // Will be updated later if needed
+                    'status' => 1 // Active by default
+                ]);
+                
+                $data['customer_id'] = $customer->id;
+            }
+            
+            // Handle transfer proof file upload
+            if ($request->hasFile('transfer_proof')) {
+                // Delete old file if exists
+                if ($deviceRepair->transfer_proof && Storage::disk('public')->exists($deviceRepair->transfer_proof)) {
+                    Storage::disk('public')->delete($deviceRepair->transfer_proof);
+                }
+                
+                $file = $request->file('transfer_proof');
+                $filename = 'transfer_proof_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('transfer_proofs', $filename, 'public');
+                $data['transfer_proof'] = $path;
+            }
+            
+            $deviceRepair->update($data);
         } catch (\Error $e) {
             ErrorHandling::environmentErrorHandling($e->getMessage());
         }
@@ -53,7 +109,7 @@ class DeviceRepairService
             $query->where('status', $request->status_filter);
         }
         
-        $array = $query->get(['id', 'customer_id', 'brand', 'model', 'reported_issue', 'serial_number', 'technician_note', 'status', 'price', 'complete_in']);
+        $array = $query->get(['id', 'nota_number', 'customer_id', 'brand', 'model', 'reported_issue', 'serial_number', 'technician_note', 'status', 'price', 'complete_in', 'payment_method', 'transfer_proof', 'created_at']);
 
         $data = [];
         $no = 0;
@@ -62,6 +118,10 @@ class DeviceRepairService
             $no++;
             $nestedData['no'] = $no;
             $nestedData['pelanggan_name'] = $item->customers ? $item->customers->name : 'No Customers';
+            
+            // Generate nota number - sama seperti di NotaService
+            $nestedData['nota_number'] = $item->nota_number ?: 'NOTA-' . date('Ym', strtotime($item->created_at)) . '-' . str_pad($item->id, 3, '0', STR_PAD_LEFT);
+            
             $nestedData['brand'] = $item->brand;
             $nestedData['model'] = $item->model;
             $nestedData['reported_issue'] = $item->reported_issue;
@@ -89,6 +149,29 @@ class DeviceRepairService
             $nestedData['price'] = $item->price ? 'Rp. ' . number_format($item->price, 0, ',', '.') : '-';
             $nestedData['complete_in'] = $item->complete_in ? $item->complete_in->format('d/m/Y') : '-';
             
+            // Payment method column
+            $nestedData['payment_method'] = $item->payment_method ? ucfirst($item->payment_method) : '-';
+            
+            // Transfer proof column
+            if ($item->payment_method === 'transfer' && $item->transfer_proof) {
+                // Check if file is image or PDF
+                $fileExtension = pathinfo($item->transfer_proof, PATHINFO_EXTENSION);
+                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                $isImage = in_array(strtolower($fileExtension), $imageExtensions);
+                
+                if ($isImage) {
+                    $nestedData['transfer_proof'] = '<a href="' . Storage::url($item->transfer_proof) . '" target="_blank" class="btn btn-outline-success btn-sm">
+                        <i class="fa fa-image"></i> Lihat
+                    </a>';
+                } else {
+                    $nestedData['transfer_proof'] = '<a href="' . Storage::url($item->transfer_proof) . '" target="_blank" class="btn btn-outline-info btn-sm">
+                        <i class="fa fa-file-pdf"></i> PDF
+                    </a>';
+                }
+            } else {
+                $nestedData['transfer_proof'] = '-';
+            }
+            
             // Tambahkan kolom "Ubah Status" (pindahan dari Status page) + Action asli
             $statusButton = '';
             if ($currentStatus == 'Perangkat Baru Masuk') {
@@ -107,6 +190,26 @@ class DeviceRepairService
             
             $nestedData['ubah_status'] = '<div class="text-center">' . $statusButton . '</div>';
             
+            // Kolom Nota Actions (Print & PDF) - sama seperti di NotaService
+            $nestedData['nota_actions'] = '
+                <div class="btn-group">
+                    <button class="btn btn-outline-info btn-sm d-inline-flex align-items-center btn-print" 
+                            data-id="' . $item->id . '" 
+                            data-price="' . ($item->price ?: 0) . '" 
+                            data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
+                            data-device="' . $item->brand . ' ' . $item->model . '">
+                        Print <i class="fa fa-print ml-2"></i> 
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center btn-pdf" 
+                            data-id="' . $item->id . '" 
+                            data-price="' . ($item->price ?: 0) . '" 
+                            data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
+                            data-device="' . $item->brand . ' ' . $item->model . '">
+                        PDF <i class="fa fa-file-pdf ml-2"></i>
+                    </button>
+                </div>
+            ';
+            
             $nestedData['actions'] = '
                 <div class="btn-group-vertical">
                 <a href="' . route('admin.MasterData.DeviceRepair.edit', $item) . '" class="btn btn-outline-info btn-sm d-inline-flex align-items-center mb-1">
@@ -121,6 +224,6 @@ class DeviceRepairService
             $data[] = $nestedData;
         }
 
-        return DataTables::of($data)->rawColumns(["actions", "status", "ubah_status"])->toJson();
+        return DataTables::of($data)->rawColumns(["actions", "status", "ubah_status", "nota_actions", "transfer_proof"])->toJson();
     }
 }

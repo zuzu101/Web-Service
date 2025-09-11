@@ -22,6 +22,8 @@ class DeviceRepair extends Model
         'technician_note',
         'status',
         'price',
+        'payment_method',
+        'transfer_proof',
         'complete_in'
     ];
 

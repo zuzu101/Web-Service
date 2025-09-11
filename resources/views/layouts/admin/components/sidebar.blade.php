@@ -21,13 +21,6 @@
                         <p>Perangkat</p>
                     </a>
                 </li>
-                
-                <li class="nav-item">
-                    <a href="{{ route('admin.MasterData.Nota.index') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Nota.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-receipt"></i>
-                        <p>Nota</p>
-                    </a>
-                </li>
 
                 <li class="nav-item has-treeview {{ request()->routeIs('admin.MasterData.Report.*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->routeIs('admin.MasterData.Report.*') ? 'active' : '' }}">

@@ -40,6 +40,7 @@
             <thead>
                 <tr>
                     <th>No.</th>
+                    <th>Nomor Nota</th>
                     <th>Pelanggan</th>
                     <th>Merek</th>
                     <th>Model</th>
@@ -49,7 +50,10 @@
                     <th>Status</th>
                     <th>Target Selesai</th>
                     <th>Estimasi Biaya</th>
+                    <th>Metode Bayar</th>
+                    <th>Bukti Transfer</th>
                     <th>Ubah Status</th>
+                    <th>Nota</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -57,12 +61,71 @@
         </table>
     </article>
 </section>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="paymentModalLabel">Input Pembayaran</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="paymentForm">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Pelanggan:</strong></label>
+                        <p id="customerName" class="text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Perangkat:</strong></label>
+                        <p id="deviceInfo" class="text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Total Biaya:</strong></label>
+                        <p id="totalPrice" class="text-success font-weight-bold h5"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paidAmount" class="form-label"><strong>Uang yang Dibayar:</strong></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Rp</span>
+                            </div>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="paidAmount" 
+                                   name="paid_amount" 
+                                   placeholder="0" 
+                                   inputmode="numeric" 
+                                   pattern="[0-9.]*" 
+                                   autocomplete="off" 
+                                   autocorrect="off" 
+                                   spellcheck="false"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="changeSection" style="display: none;">
+                        <label class="form-label"><strong>Kembalian:</strong></label>
+                        <p id="changeAmount" class="text-info font-weight-bold h5"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="processPrint">Print</button>
+                <button type="button" class="btn btn-danger" id="processPDF">PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let dataTable;
+    let currentNota = {};
     
     $(function() {
         dataTable = $('#datatable').DataTable({
@@ -81,9 +144,10 @@
                     d.status_filter = $('#status_filter').val();
                 }
             },
-            //column for DeviceRepair dengan kolom Ubah Status
+            //column for DeviceRepair dengan kolom Ubah Status dan Nota
             columns: [
                 { data: 'no', name: 'no', className: "text-center align-middle" },
+                { data: 'nota_number', name: 'nota_number', className: "align-middle" },
                 { data: 'pelanggan_name', name: 'pelanggan_name', className: "align-middle" },
                 { data: 'brand', name: 'brand', className: "align-middle" },
                 { data: 'model', name: 'model', className: "align-middle" },
@@ -93,7 +157,10 @@
                 { data: 'status', name: 'status', className: "align-middle" },
                 { data: 'complete_in', name: 'complete_in', className: "align-middle text-center" },
                 { data: 'price', name: 'price', className: "align-middle" },
+                { data: 'payment_method', name: 'payment_method', className: "align-middle text-center" },
+                { data: 'transfer_proof', name: 'transfer_proof', className: "align-middle text-center", sortable: false, searchable: false },
                 { data: 'ubah_status', name: 'ubah_status', className: "text-center align-middle", sortable: false, searchable: false },
+                { data: 'nota_actions', name: 'nota_actions', className: "text-center align-middle", sortable: false, searchable: false },
                 { data: 'actions', name: 'actions', className: "align-middle", sortable: false, searchable: false },
             ]
         });
@@ -110,6 +177,175 @@
 
             // Reload DataTable
             dataTable.ajax.reload();
+        });
+
+        // Handle Print button click from Nota actions
+        $(document).on('click', '.btn-print', function() {
+            currentNota = {
+                id: $(this).data('id'),
+                customer: $(this).data('customer'),
+                device: $(this).data('device'),
+                price: parseFloat($(this).data('price')) || 0,
+                action: 'print'
+            };
+            
+            showPaymentModal();
+        });
+
+        // Handle PDF button click from Nota actions
+        $(document).on('click', '.btn-pdf', function() {
+            currentNota = {
+                id: $(this).data('id'),
+                customer: $(this).data('customer'),
+                device: $(this).data('device'),
+                price: parseFloat($(this).data('price')) || 0,
+                action: 'pdf'
+            };
+            
+            showPaymentModal();
+        });
+
+        // Format input nominal dengan pemisah ribuan
+        $('#paidAmount').on('input', function() {
+            let value = $(this).val().replace(/[^0-9]/g, ''); // Hapus semua kecuali angka
+            if (value) {
+                // Format dengan pemisah ribuan
+                let formatted = formatNumber(parseInt(value));
+                $(this).val(formatted);
+            } else {
+                $(this).val(''); // Clear jika tidak ada angka
+            }
+            
+            // Calculate change
+            const paidAmount = parseFloat(value) || 0;
+            const totalPrice = currentNota.price || 0;
+            const change = Math.max(0, paidAmount - totalPrice);
+            
+            if (paidAmount > 0 && paidAmount >= totalPrice) {
+                $('#changeAmount').text('Rp ' + formatNumber(change));
+                $('#changeSection').show();
+            } else {
+                $('#changeSection').hide();
+            }
+        });
+
+        // Prevent non-numeric input completely
+        $('#paidAmount').on('keydown', function(e) {
+            // Allow: backspace, delete, tab, escape, enter, home, end, left, right
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 35, 36, 37, 39]) !== -1 ||
+                // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z
+                (e.ctrlKey === true && $.inArray(e.keyCode, [65, 67, 86, 88, 90]) !== -1)) {
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        // Also prevent paste of non-numeric content
+        $('#paidAmount').on('paste', function(e) {
+            e.preventDefault();
+            let paste = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+            let numericOnly = paste.replace(/[^0-9]/g, '');
+            if (numericOnly) {
+                let formatted = formatNumber(parseInt(numericOnly));
+                $(this).val(formatted).trigger('input');
+            }
+        });
+
+        // Prevent drag and drop
+        $('#paidAmount').on('drop dragover', function(e) {
+            e.preventDefault();
+        });
+
+        // Process Print
+        $('#processPrint').click(function() {
+            const paidAmountStr = $('#paidAmount').val().replace(/[^0-9]/g, ''); // Remove formatting
+            const paidAmount = parseFloat(paidAmountStr) || 0;
+            
+            if (paidAmount < currentNota.price) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pembayaran Kurang',
+                    text: 'Jumlah pembayaran harus minimal sama dengan total biaya.'
+                });
+                return;
+            }
+            
+            const url = '{{ route("admin.MasterData.Nota.print", ":id") }}'.replace(':id', currentNota.id);
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            form.target = '_blank';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            // Add paid amount
+            const paidInput = document.createElement('input');
+            paidInput.type = 'hidden';
+            paidInput.name = 'paid_amount';
+            paidInput.value = paidAmount;
+            form.appendChild(paidInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            $('#paymentModal').modal('hide');
+        });
+
+        // Process PDF
+        $('#processPDF').click(function() {
+            const paidAmountStr = $('#paidAmount').val().replace(/[^0-9]/g, ''); // Remove formatting
+            const paidAmount = parseFloat(paidAmountStr) || 0;
+            
+            if (paidAmount < currentNota.price) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pembayaran Kurang',
+                    text: 'Jumlah pembayaran harus minimal sama dengan total biaya.'
+                });
+                return;
+            }
+            
+            const url = '{{ route("admin.MasterData.Nota.pdf", ":id") }}'.replace(':id', currentNota.id);
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            form.target = '_blank';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            // Add paid amount
+            const paidInput = document.createElement('input');
+            paidInput.type = 'hidden';
+            paidInput.name = 'paid_amount';
+            paidInput.value = paidAmount;
+            form.appendChild(paidInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            $('#paymentModal').modal('hide');
+        });
+
+        // Reset modal when closed
+        $('#paymentModal').on('hidden.bs.modal', function() {
+            $('#paymentForm')[0].reset();
+            $('#changeSection').hide();
+            currentNota = {};
         });
     });
 
@@ -192,6 +428,19 @@
                 });
             }
         });
+    }
+
+    function showPaymentModal() {
+        $('#customerName').text(currentNota.customer);
+        $('#deviceInfo').text(currentNota.device);
+        $('#totalPrice').text('Rp ' + formatNumber(currentNota.price));
+        $('#paidAmount').val('');
+        $('#changeSection').hide();
+        $('#paymentModal').modal('show');
+    }
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 </script>
 @endpush

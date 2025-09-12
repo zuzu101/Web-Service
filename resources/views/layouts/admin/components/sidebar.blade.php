@@ -32,39 +32,15 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.index') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.index') ? 'active' : '' }}">
-                                
-                                <p>Dashboard Laporan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.daily') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.daily') ? 'active' : '' }}">
-                                
-                                <p>Laporan Harian</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.weekly') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.weekly') ? 'active' : '' }}">
-                                
-                                <p>Laporan Mingguan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.monthly') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.monthly') ? 'active' : '' }}">
-                                
-                                <p>Laporan Bulanan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{{ route('admin.MasterData.Report.brand') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.brand') ? 'active' : '' }}">
                                 
                                 <p>Laporan per Brand</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.history') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.history') ? 'active' : '' }}">
+                            <a href="{{ route('admin.MasterData.Report.dashboard') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.dashboard') ? 'active' : '' }}">
                                 
-                                <p>Riwayat Semua Transaksi</p>
+                                <p>Dashboard Laporan</p>
                             </a>
                         </li>
                     </ul>

@@ -4,12 +4,12 @@
 <header class="container-fluid">
     <div class="row mb-2">
         <div class="col-sm-6">
-            <h1>Riwayat Semua Transaksi Service</h1>
+            <h1>Dashboard Laporan Service</h1>
         </div>
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="{{ route('admin.MasterData.Report.index') }}">Laporan</a></li>
-                <li class="breadcrumb-item active">Riwayat Transaksi</li>
+                <li class="breadcrumb-item active">Dashboard</li>
             </ol>
         </div>
     </div>
@@ -23,7 +23,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h6 class="m-0 font-weight-bold text-primary">Filter Riwayat Transaksi</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Filter Dashboard Laporan</h6>
                 </div>
                 <div class="card-body">
                     <form id="filter-form">
@@ -184,7 +184,7 @@ $(function() {
         scrollX: true,
         ajax: {
             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-            url: "{{ route('admin.MasterData.Report.history.data') }}",
+            url: "{{ route('admin.MasterData.Report.dashboard.data') }}",
             dataType: "json",
             type: "POST",
             data: function(d) {
@@ -290,7 +290,7 @@ $(function() {
             _token: '{{ csrf_token() }}'
         };
 
-        $.post("{{ route('admin.MasterData.Report.history.summary') }}", params)
+        $.post("{{ route('admin.MasterData.Report.dashboard.summary') }}", params)
         .done(function(response) {
             $('#total-transactions').text(response.total_transactions);
             $('#completed-transactions').text(response.completed_transactions);
@@ -328,5 +328,6 @@ $(function() {
     updateSummary();
 
 });
+
 </script>
 @endpush

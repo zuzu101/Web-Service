@@ -69,25 +69,17 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
                 Route::match(['GET', 'POST'], '{id}/pdf', [NotaController::class, 'pdf'])->name('pdf');
             });
 
-            // Report Routes
+            // Report Routes - Brand and Dashboard only
             Route::resource('Report', ReportController::class)->only('index');
             Route::group(['prefix' => 'Report', 'as' => 'Report.'], function () {
-                // Main report pages
-                Route::get('daily', [ReportController::class, 'daily'])->name('daily');
-                Route::get('weekly', [ReportController::class, 'weekly'])->name('weekly');
-                Route::get('monthly', [ReportController::class, 'monthly'])->name('monthly');
+                // Brand report
                 Route::get('brand', [ReportController::class, 'brand'])->name('brand');
-                Route::get('issue', [ReportController::class, 'issue'])->name('issue');
-                Route::get('history', [ReportController::class, 'history'])->name('history');
-                
-                // Data endpoints
-                Route::post('daily/data', [ReportController::class, 'dailyData'])->name('daily.data');
-                Route::post('weekly/data', [ReportController::class, 'weeklyData'])->name('weekly.data');
-                Route::post('monthly/data', [ReportController::class, 'monthlyData'])->name('monthly.data');
                 Route::post('brand/data', [ReportController::class, 'brandData'])->name('brand.data');
-                Route::post('issue/data', [ReportController::class, 'issueData'])->name('issue.data');
-                Route::post('history/data', [ReportController::class, 'historyData'])->name('history.data');
-                Route::post('history/summary', [ReportController::class, 'historySummary'])->name('history.summary');
+                
+                // Main dashboard report (previously history)
+                Route::get('dashboard', [ReportController::class, 'dashboard'])->name('dashboard');
+                Route::post('dashboard/data', [ReportController::class, 'dashboardData'])->name('dashboard.data');
+                Route::post('dashboard/summary', [ReportController::class, 'dashboardSummary'])->name('dashboard.summary');
                 
                 // Export endpoints
                 Route::get('export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');

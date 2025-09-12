@@ -25,33 +25,6 @@ class ReportController extends Controller
     }
 
     /**
-     * Daily service report
-     */
-    public function daily(Request $request)
-    {
-        $date = $request->get('date', now()->format('Y-m-d'));
-        return view('back.MasterData.Report.daily', compact('date'));
-    }
-
-    /**
-     * Weekly service report
-     */
-    public function weekly(Request $request)
-    {
-        $week = $request->get('week', now()->format('Y-W'));
-        return view('back.MasterData.Report.weekly', compact('week'));
-    }
-
-    /**
-     * Monthly service report
-     */
-    public function monthly(Request $request)
-    {
-        $month = $request->get('month', now()->format('Y-m'));
-        return view('back.MasterData.Report.monthly', compact('month'));
-    }
-
-    /**
      * Brand report
      */
     public function brand()
@@ -61,55 +34,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Issue type report
+     * Dashboard report - combines all transaction analysis
      */
-    public function issue()
+    public function dashboard()
     {
-        return view('back.MasterData.Report.issue');
-    }
-
-    /**
-     * Transaction history report
-     */
-    public function history()
-    {
-        return view('back.MasterData.Report.history');
-    }
-
-    /**
-     * Get daily report data
-     */
-    public function dailyData(Request $request)
-    {
-        $date = $request->get('date', now()->format('Y-m-d'));
-        return $this->reportService->getDailyReport($date);
-    }
-
-    /**
-     * Get weekly report data
-     */
-    public function weeklyData(Request $request)
-    {
-        $week = $request->get('week', now()->format('Y-W'));
-        
-        // Debug log
-        Log::info('Weekly report week parameter: ' . $week);
-        
-        try {
-            return $this->reportService->getWeeklyReport($week);
-        } catch (\Exception $e) {
-            Log::error('Weekly report error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Get monthly report data
-     */
-    public function monthlyData(Request $request)
-    {
-        $month = $request->get('month', now()->format('Y-m'));
-        return $this->reportService->getMonthlyReport($month);
+        return view('back.MasterData.Report.dashboard');
     }
 
     /**
@@ -121,18 +50,17 @@ class ReportController extends Controller
     }
 
     /**
-
-     * Get transaction history data
+     * Get dashboard data
      */
-    public function historyData(Request $request)
+    public function dashboardData(Request $request)
     {
         return $this->reportService->getTransactionHistory($request);
     }
 
     /**
-     * Get transaction history summary
+     * Get dashboard summary
      */
-    public function historySummary(Request $request)
+    public function dashboardSummary(Request $request)
     {
         return response()->json($this->reportService->getTransactionHistorySummary($request));
     }

@@ -218,20 +218,20 @@ class DeviceRepairService
             
             // Kolom Nota Actions (Print & PDF) - sama seperti di NotaService
             $nestedData['nota_actions'] = '
-                <div class="btn-group">
-                    <button class="btn btn-outline-info btn-sm d-inline-flex align-items-center btn-print" 
+                <div class="btn-group-vertical">
+                    <button class="btn btn-outline-info btn-sm d-inline-flex align-items-center mb-1 btn-print" 
                             data-id="' . $item->id . '" 
                             data-price="' . ($item->price ?: 0) . '" 
                             data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
                             data-device="' . $item->brand . ' ' . $item->model . '">
-                        Print <i class="fa fa-print ml-2"></i> 
+                        <i class="fas fa-print mr-1"></i> Print
                     </button>
                     <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center btn-pdf" 
                             data-id="' . $item->id . '" 
                             data-price="' . ($item->price ?: 0) . '" 
                             data-customer="' . ($item->customers ? $item->customers->name : 'No Customer') . '"
                             data-device="' . $item->brand . ' ' . $item->model . '">
-                        PDF <i class="fa fa-file-pdf ml-2"></i>
+                        <i class="fas fa-file-pdf mr-1"></i> PDF
                     </button>
                 </div>
             ';

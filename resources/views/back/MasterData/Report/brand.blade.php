@@ -18,6 +18,30 @@
 
 @section('content')
 <section class="container-fluid">
+    <!-- Brand Charts - At the Very Top -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Service per Brand</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="brandChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Pendapatan per Brand</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filter & Export Options -->
     <div class="row mb-4">
         <div class="col-12">
@@ -47,7 +71,7 @@
         </div>
     </div>
 
-    <!-- Brand Statistics -->
+    <!-- Brand Statistics Table -->
     <div class="card shadow">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Statistik Service per Brand Device</h6>
@@ -68,30 +92,6 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Brand Chart -->
-    <div class="row mt-4">
-        <div class="col-lg-6">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Service per Brand</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="brandChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Pendapatan per Brand</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueChart"></canvas>
-                </div>
             </div>
         </div>
     </div>

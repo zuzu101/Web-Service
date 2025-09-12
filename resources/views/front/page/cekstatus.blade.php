@@ -51,46 +51,52 @@
                             {{-- Judul dan Sub-judul Section --}}
                             <h2 class="header-2 color-navy fw-bold text-center mb-4">Hasil Pencarian</h2>
 
-                            {{-- Kartu Hasil Lacak --}}
+                            {{-- Kartu Hasil Lacak --}}           
                             <div class="result-card">
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-baseline mb-3">
                                     <div>
-                                        <h5 class="header-4 color-navy mb-1">Hasil Lacak: <span class="fw-bold text-navy">#{{ $servis->nota_number }}</span></h5>
-                                        <p class="body-1 color-navy mb-0">
-                                            Pelanggan: {{ $servis->customers->name }} - {{ $servis->brand }} {{ $servis->model }}
-                                        </p>
+                                        <p class="color-navy mb-1" >Pelanggan</p>
+                                        <h5 class="color-navy fw-bold mb-0" >
+                                            {{ $servis->customers->name }}
+                                        </h5>
                                     </div>
-                                    @php
-                                        $currentStatus = $servis->status ?: 'Perangkat Baru Masuk';
-                                        $statusClass = '';
-                                        switch($currentStatus) {
-                                            case 'Selesai':
-                                                $statusClass = 'status-badge bg-success';
-                                                break;
-                                            case 'Sedang Diperbaiki':
-                                                $statusClass = 'status-badge bg-warning';
-                                                break;
-                                            case 'Perangkat Baru Masuk':
-                                                $statusClass = 'status-badge bg-secondary';
-                                                break;
-                                            default:
-                                                $statusClass = 'status-badge bg-secondary';
-                                        }
-                                    @endphp
-                                    <span class="{{ $statusClass }}">{{ $currentStatus }}</span>  
+
+                                    <div class="text-end">
+                                        <p class="color-navy mb-1">Perangkat</p>
+                                        <h5 class="color-navy fw-bold mb-0" >
+                                            {{ $servis->brand }} {{ $servis->model }}
+                                        </h5>
+                                    </div>
                                 </div>
 
                                 <hr class="my-3">
 
-                                <div>
-                                    <h6 class="header-4 color-navy mb-3">Detail & Catatan</h6>
-                                    <div class="detail-section">
-                                        <strong>Kerusakan Dilaporkan:</strong>
-                                        <p class="">{{ $servis->reported_issue }}</p>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1 me-3"> {{-- flex-grow-1 agar mengambil sisa ruang --}}
+                                        <h5 class="color-navy fw-bold mb-2" >Kerusakan Dilaporkan:</h5>
+                                        <p class="color-navy mb-0" >{{ $servis->reported_issue }}</p>
                                     </div>
-                                    <div class="detail-section mt-3">
-                                        <strong>Catatan Teknisi:</strong>
-                                        <p class="">{{ $servis->technician_note ?? 'Belum ada catatan dari teknisi.' }}</p>
+
+                                    <div class="text-end">
+                                        <p class="color-navy mb-2">Status</p>
+                                        @php
+                                            $currentStatus = $servis->status ?: 'Perangkat Baru Masuk';
+                                            $statusClass = '';
+                                            switch($currentStatus) {
+                                                case 'Selesai':
+                                                    $statusClass = 'status-badge bg-success';
+                                                    break;
+                                                case 'Sedang Diperbaiki':
+                                                    $statusClass = 'status-badge bg-warning';
+                                                    break;
+                                                case 'Perangkat Baru Masuk':
+                                                    $statusClass = 'status-badge bg-secondary';
+                                                    break;
+                                                default:
+                                                    $statusClass = 'status-badge bg-secondary';
+                                            }
+                                        @endphp
+                                        <span class="{{ $statusClass }}">{{ $currentStatus }}</span>
                                     </div>
                                 </div>
                             </div>

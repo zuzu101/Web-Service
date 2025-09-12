@@ -31,6 +31,11 @@ class ServiceOrderController extends Controller
                     'phone' => $request->phone,
                     'email' => $request->email,
                     'address' => $request->address,
+                    'province_id' => $request->province_id,
+                    'regency_id' => $request->regency_id,
+                    'district_id' => $request->district_id,
+                    'village_id' => $request->village_id,
+                    'street_address' => $request->street_address,
                     'status' => 1, // Active by default
                 ]);
             } else {
@@ -39,6 +44,11 @@ class ServiceOrderController extends Controller
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
+                    'province_id' => $request->province_id,
+                    'regency_id' => $request->regency_id,
+                    'district_id' => $request->district_id,
+                    'village_id' => $request->village_id,
+                    'street_address' => $request->street_address,
                 ]);
             }
 
@@ -105,35 +115,6 @@ class ServiceOrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan. Silakan coba lagi atau hubungi customer service.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get brands for chatbot dropdown
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getBrands()
-    {
-        try {
-            $brands = DeviceRepair::select('brand')
-                ->distinct()
-                ->whereNotNull('brand')
-                ->where('brand', '!=', '')
-                ->orderBy('brand')
-                ->pluck('brand');
-
-            return response()->json([
-                'success' => true,
-                'data' => $brands
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil data merek',
                 'error' => $e->getMessage()
             ], 500);
         }

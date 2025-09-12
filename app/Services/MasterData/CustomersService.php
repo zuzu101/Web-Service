@@ -19,7 +19,41 @@ class CustomersService
         $request->validated();
 
         try {
-            Customers::create($request->all());
+            $data = $request->all();
+            
+            // Generate full address for backward compatibility
+            if (!empty($data['province_id']) || !empty($data['regency_id'])) {
+                $addressParts = [];
+                
+                if (!empty($data['street_address'])) {
+                    $addressParts[] = $data['street_address'];
+                }
+                
+                // Get region names for address
+                if (!empty($data['village_id'])) {
+                    $village = \App\Models\Village::find($data['village_id']);
+                    if ($village) $addressParts[] = $village->name;
+                }
+                
+                if (!empty($data['district_id'])) {
+                    $district = \App\Models\District::find($data['district_id']);
+                    if ($district) $addressParts[] = $district->name;
+                }
+                
+                if (!empty($data['regency_id'])) {
+                    $regency = \App\Models\Regency::find($data['regency_id']);
+                    if ($regency) $addressParts[] = $regency->name;
+                }
+                
+                if (!empty($data['province_id'])) {
+                    $province = \App\Models\Province::find($data['province_id']);
+                    if ($province) $addressParts[] = $province->name;
+                }
+                
+                $data['address'] = implode(', ', $addressParts);
+            }
+            
+            Customers::create($data);
         } catch (\Error $e) {
             ErrorHandling::environmentErrorHandling($e->getMessage());
         }
@@ -46,7 +80,7 @@ class CustomersService
 
     public function data(object $customers)
     {
-        $array = $customers->orderBy('id', 'desc')->get(['id', 'name', 'email', 'phone', 'address', 'status']);
+        $array = $customers->with(['province', 'regency', 'district', 'village'])->orderBy('id', 'desc')->get(['id', 'name', 'email', 'phone', 'address', 'province_id', 'regency_id', 'district_id', 'village_id', 'street_address', 'status']);
 
         $data = [];
         $no = 0;
@@ -57,7 +91,10 @@ class CustomersService
             $nestedData['name'] = $item->name;
             $nestedData['email'] = $item->email;
             $nestedData['phone'] = $item->phone;
-            $nestedData['address'] = $item->address;
+            
+            // Use full_address accessor or fallback to old address
+            $nestedData['address'] = $item->full_address ?: $item->address ?: '-';
+            
             $nestedData['status'] = $item->status ? 'Active' : 'Inactive';
             $nestedData['actions'] = '
             <div class="btn-group">

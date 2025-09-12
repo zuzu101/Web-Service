@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MasterData\CustomersRequest;
 use App\Models\MasterData\Customers;
 use App\Services\MasterData\CustomersService;
+use App\Models\Province;
+use App\Models\Regency;
+use App\Models\District;
+use App\Models\Village;
 use Illuminate\Http\Request;
 
 class CustomersController extends Controller
@@ -33,7 +37,8 @@ class CustomersController extends Controller
      */
     public function create()
     {
-        return view('back.MasterData.customers.create');
+        $provinces = Province::orderBy('name')->get();
+        return view('back.MasterData.customers.create', compact('provinces'));
     }
 
     /**
@@ -55,9 +60,28 @@ class CustomersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Customers $customer)
+    public function edit($id)
     {
-        return view('back.MasterData.customers.edit', compact('customer'));
+        $customer = Customers::findOrFail($id);
+        
+        $provinces = Province::all();
+        $regencies = collect();
+        $districts = collect();
+        $villages = collect();
+        
+        if ($customer->province_id) {
+            $regencies = Regency::where('province_id', $customer->province_id)->get();
+        }
+        
+        if ($customer->regency_id) {
+            $districts = District::where('regency_id', $customer->regency_id)->get();
+        }
+        
+        if ($customer->district_id) {
+            $villages = Village::where('district_id', $customer->district_id)->get();
+        }
+        
+        return view('back.MasterData.customers.edit', compact('customer', 'provinces', 'regencies', 'districts', 'villages'));
     }
 
     /**

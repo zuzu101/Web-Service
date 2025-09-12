@@ -109,6 +109,14 @@ html, body {
     font-size: 14px;
     padding: 8px 20px;
 }
+/* Atur ikon search agar warnanya sesuai dengan teks navy di awal */
+.navbar .nav-link .search-icon {
+    transition: filter 0.3s ease; 
+}
+
+.navbar .nav-link:hover .search-icon {
+    filter: invert(37%) sepia(99%) saturate(4123%) hue-rotate(198deg) brightness(101%) contrast(106%);
+}
 /* End Navbar */
 
 

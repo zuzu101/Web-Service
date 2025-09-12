@@ -26,7 +26,9 @@
                     <a class="nav-link" href="{{ request()->is('/') ? '#kontak' : route('front.home') . '#kontak' }}">Kontak</a>
                 </li>
                 <li class="nav-item ms-lg-3">
-                    <a class="nav-link" href="{{ route('front.cek-status') }}">Cek Status</a>
+                    <a class="nav-link" href="{{ route('front.cek-status') }}">
+                        Cek Status <img src="{{ asset('images/search.png') }}" class="img-fluid search-icon" alt="Logo"> 
+                    </a>
                 </li>
             </ul>
         </div>

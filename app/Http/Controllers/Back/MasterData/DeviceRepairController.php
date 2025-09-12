@@ -52,9 +52,15 @@ class DeviceRepairController extends Controller
      */
     public function store(DeviceRepairRequest $deviceRepairRequest)
     {
-        $this->deviceRepairService->store($deviceRepairRequest);
-
-        return redirect()->route('admin.MasterData.DeviceRepair.index')->with('success', 'Data Berhasil Ditambahkan');
+        try {
+            $this->deviceRepairService->store($deviceRepairRequest);
+            return redirect()->route('admin.MasterData.DeviceRepair.index')->with('success', 'Data Berhasil Ditambahkan');
+        } catch (\Exception $e) {
+            \Log::error('DeviceRepair Controller Store Error: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+        }
     }
 
     /**

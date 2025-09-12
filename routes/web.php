@@ -29,9 +29,8 @@ Route::group(['as' => 'front.'], function () {
     // Service Order Routes
     Route::post('/service-order', [ServiceOrderController::class, 'store'])->name('service-order.store');
     
-    // Chatbot API Routes
+    // Chatbot Routes
     Route::post('/chatbot-order', [ServiceOrderController::class, 'storeChatbot'])->name('chatbot-order.store');
-    Route::get('/api/brands', [ServiceOrderController::class, 'getBrands'])->name('api.brands');
     Route::post('/klik-wa', [ServiceOrderController::class, 'klikWa'])->name('klik-wa');
 
 });

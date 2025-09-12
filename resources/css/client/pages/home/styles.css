@@ -26,8 +26,10 @@
 /* Keunggulan Section */
 #keunggulan {
     padding-top: 80px;
-    padding-bottom: 40px;
+    padding-bottom: 80px;
     background-color: var(--neutral);
+    border-top: 2px solid #E0E7ED;
+    border-bottom: 2px solid #E0E7ED;
 }
 
 .keunggulan-item {
@@ -168,6 +170,8 @@
     padding-top: 60px;
     padding-bottom: 60px;
     background-color: var(--neutral);
+    border-bottom: 2px solid #E0E7ED;
+
 }
 
 #proses .card {

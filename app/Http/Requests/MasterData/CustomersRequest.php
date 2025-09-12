@@ -27,7 +27,12 @@ class CustomersRequest extends FormRequest
             'name' => 'required|string|max:255',
             'phone' => 'required|numeric|digits_between:10,15',
             'email' => 'required|email|max:255',
-            'address' => 'required|string|max:500',
+            'province_id' => 'required|exists:provinces,id',
+            'regency_id' => 'required|exists:regencies,id',
+            'district_id' => 'nullable|exists:districts,id',
+            'village_id' => 'nullable|exists:villages,id',
+            'street_address' => 'nullable|string|max:1000',
+            'address' => 'nullable|string|max:500', // Keep for backward compatibility
             'status' => 'required|in:0,1',
         ];
     }
@@ -43,6 +48,12 @@ class CustomersRequest extends FormRequest
             'phone.numeric' => 'Nomor telepon hanya boleh berisi angka.',
             'phone.digits_between' => 'Nomor telepon harus antara 10-15 digit.',
             'email.email' => 'Format email tidak valid.',
+            'province_id.required' => 'Provinsi harus dipilih.',
+            'province_id.exists' => 'Provinsi yang dipilih tidak valid.',
+            'regency_id.required' => 'Kabupaten/Kota harus dipilih.',
+            'regency_id.exists' => 'Kabupaten/Kota yang dipilih tidak valid.',
+            'district_id.exists' => 'Kecamatan yang dipilih tidak valid.',
+            'village_id.exists' => 'Desa/Kelurahan yang dipilih tidak valid.',
             'status.in' => 'Status harus Active atau Inactive.',
         ];
     }

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MasterData\DeviceRepair;
+use App\Models\Province;
+use App\Models\Regency;
+use App\Models\District;
 
 class HomeController extends Controller
 {
@@ -25,7 +28,10 @@ class HomeController extends Controller
             ->orderBy('brand')
             ->pluck('brand');
 
-        return view('front.home.index', compact('brands'));
+        // Get provinces for address selection
+        $provinces = Province::orderBy('name')->get();
+
+        return view('front.home.index', compact('brands', 'provinces'));
     }
 
     public function cekStatus(Request $request)

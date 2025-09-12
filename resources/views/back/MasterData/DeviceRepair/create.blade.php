@@ -37,6 +37,9 @@
                     <small class="form-text text-muted">
                         Pilih dari daftar pelanggan yang sudah ada, atau ketik nama baru untuk menambah pelanggan baru.
                     </small>
+                    @error('customer_id')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Merk Laptop --}}
@@ -66,40 +69,58 @@
                     <small class="form-text text-muted">
                         Pilih merk dari daftar atau ketik merk baru untuk menambahkannya ke database.
                     </small>
+                    @error('brand')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Model --}}
                 <div class="form-group">
                     <label for="model">Model</label>
-                    <input type="text" name="model" class="form-control" placeholder="Cth: ROG Strix G15, ThinkPad T480" required>
+                    <input type="text" name="model" class="form-control" value="{{ old('model') }}" placeholder="Cth: ROG Strix G15, ThinkPad T480" required>
+                    @error('model')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Serial Number --}}
                 <div class="form-group">
                     <label for="serial_number">Serial Number Laptop</label>
-                    <input type="text" name="serial_number" class="form-control" placeholder="Masukkan serial number (jika ada)" required>
+                    <input type="text" name="serial_number" class="form-control" value="{{ old('serial_number') }}" placeholder="Masukkan serial number (jika ada)" required>
+                    @error('serial_number')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Kerusakan Yang Dilaporkan --}}
                 <div class="form-group">
                     <label for="reported_issue">Kerusakan Yang Dilaporkan</label>
-                    <textarea name="reported_issue" class="form-control" rows="3" placeholder="Cth: Mati total, layar bergaris, keyboard error" required></textarea>
+                    <textarea name="reported_issue" class="form-control" rows="3" placeholder="Cth: Mati total, layar bergaris, keyboard error" required>{{ old('reported_issue') }}</textarea>
+                    @error('reported_issue')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Catatan Teknisi --}}
                 <div class="form-group">
                     <label for="technician_note">Catatan Teknisi (Opsional)</label>
-                    <textarea name="technician_note" class="form-control" rows="3" placeholder="Cth: Dicurigai kerusakan pada IC power"></textarea>
+                    <textarea name="technician_note" class="form-control" rows="3" placeholder="Cth: Dicurigai kerusakan pada IC power">{{ old('technician_note') }}</textarea>
+                    @error('technician_note')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Status --}}
                 <div class="form-group">
                     <label for="status">Status Awal</label>
                     <select name="status" class="form-control" required>
-                        <option value="Perangkat Baru Masuk">Perangkat Baru Masuk</option>
-                        <option value="Sedang Diperbaiki">Sedang Diperbaiki</option>
-                        <option value="Selesai">Selesai</option>
+                        <option value="Perangkat Baru Masuk" {{ old('status') == 'Perangkat Baru Masuk' ? 'selected' : '' }}>Perangkat Baru Masuk</option>
+                        <option value="Sedang Diperbaiki" {{ old('status') == 'Sedang Diperbaiki' ? 'selected' : '' }}>Sedang Diperbaiki</option>
+                        <option value="Selesai" {{ old('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
                     </select>
+                    @error('status')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Estimasi Biaya --}}
@@ -109,15 +130,21 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Rp</span>
                         </div>
-                        <input type="text" name="price_display" id="price_display" class="form-control" placeholder="Masukkan angka saja">
-                        <input type="hidden" name="price" id="price_hidden">
+                        <input type="text" name="price_display" id="price_display" class="form-control" placeholder="Masukkan angka saja" value="{{ old('price') ? number_format(old('price'), 0, ',', '.') : '' }}">
+                        <input type="hidden" name="price" id="price_hidden" value="{{ old('price') }}">
                     </div>
+                    @error('price')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Target Selesai --}}
                 <div class="form-group">
                     <label for="complete_in">Target Selesai</label>
-                    <input type="date" name="complete_in" class="form-control">
+                    <input type="date" name="complete_in" class="form-control" value="{{ old('complete_in') }}">
+                    @error('complete_in')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Payment Method --}}
@@ -128,15 +155,21 @@
                         <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
                         <option value="transfer" {{ old('payment_method') == 'transfer' ? 'selected' : '' }}>Transfer</option>
                     </select>
+                    @error('payment_method')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 {{-- Transfer Proof (Only show when transfer is selected) --}}
-                <div class="form-group" id="transfer_proof_group" style="display: none;">
+                <div class="form-group" id="transfer_proof_group" style="{{ old('payment_method') == 'transfer' ? 'display: block;' : 'display: none;' }}">
                     <label for="transfer_proof">Bukti Transfer</label>
-                    <input type="file" name="transfer_proof" id="transfer_proof" class="form-control-file" accept="image/*,.pdf">
+                    <input type="file" name="transfer_proof" id="transfer_proof" class="form-control-file" accept="image/*,.pdf" {{ old('payment_method') == 'transfer' ? 'required' : '' }}>
                     <small class="form-text text-muted">
                         Upload bukti transfer (gambar atau PDF). Maksimal 2MB.
                     </small>
+                    @error('transfer_proof')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
                 
                 {{-- Buttons --}}
@@ -152,10 +185,29 @@
 
 @endsection
 
-
-
 @push('js')
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
     $(document).ready(function() {
         // Initialize Select2 for pelanggan field
         $('#customer_id').select2({
@@ -256,6 +308,31 @@
             $('#transfer_proof_group').show();
             $('#transfer_proof').attr('required', true);
         }
+
+        // Form submission handler
+        $('#form-validation').on('submit', function(e) {
+            if (!$(this).valid()) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Periksa Form!',
+                    text: 'Mohon lengkapi semua field yang wajib diisi.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+            
+            // Re-enable button after 10 seconds (fallback)
+            setTimeout(function() {
+                submitBtn.prop('disabled', false).html(originalText);
+            }, 10000);
+        });
 
         $('#form-validation').validate({
             rules: {

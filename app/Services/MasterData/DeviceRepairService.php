@@ -26,11 +26,17 @@ class DeviceRepairService
             if (isset($data['customer_id']) && strpos($data['customer_id'], 'new:') === 0) {
                 $customerName = substr($data['customer_id'], 4); // Remove 'new:' prefix
                 
-                // Create new customer with minimal data
+                // Create new customer with minimal data, fill empty fields with "-"
                 $customer = \App\Models\MasterData\Customers::create([
                     'name' => $customerName,
-                    'phone' => '', // Will be updated later if needed
-                    'address' => '', // Will be updated later if needed
+                    'phone' => '-',
+                    'email' => '-',
+                    'address' => '-',
+                    'province_id' => null,
+                    'regency_id' => null,
+                    'district_id' => null,
+                    'village_id' => null,
+                    'street_address' => '-',
                     'status' => 1 // Active by default
                 ]);
                 
@@ -45,9 +51,23 @@ class DeviceRepairService
                 $data['transfer_proof'] = $path;
             }
             
+            // Generate nota number if not provided
+            if (!isset($data['nota_number']) || empty($data['nota_number'])) {
+                $lastId = DeviceRepair::max('id') ?? 0;
+                $nextId = $lastId + 1;
+                $data['nota_number'] = 'NOTA-' . date('Ym') . '-' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
+            }
+            
             DeviceRepair::create($data);
+            
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('DeviceRepair store error: ' . $e->getMessage());
+            throw $e;
         } catch (\Error $e) {
+            \Log::error('DeviceRepair store error: ' . $e->getMessage());
             ErrorHandling::environmentErrorHandling($e->getMessage());
+            throw $e;
         }
     }
 
@@ -62,11 +82,17 @@ class DeviceRepairService
             if (isset($data['customer_id']) && strpos($data['customer_id'], 'new:') === 0) {
                 $customerName = substr($data['customer_id'], 4); // Remove 'new:' prefix
                 
-                // Create new customer with minimal data
+                // Create new customer with minimal data, fill empty fields with "-"
                 $customer = \App\Models\MasterData\Customers::create([
                     'name' => $customerName,
-                    'phone' => '', // Will be updated later if needed
-                    'address' => '', // Will be updated later if needed
+                    'phone' => '-',
+                    'email' => '-',
+                    'address' => '-',
+                    'province_id' => null,
+                    'regency_id' => null,
+                    'district_id' => null,
+                    'village_id' => null,
+                    'street_address' => '-',
                     'status' => 1 // Active by default
                 ]);
                 

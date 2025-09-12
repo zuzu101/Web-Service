@@ -9,7 +9,7 @@
                     <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid d-lg-none hero-img" alt="Teknisi sedang bekerja">
                     <p class="body-1 color-navy fw-normal mb-4 ">Kami siap membantu mengatasi berbagai masalah pada perangkat Anda, mulai dari laptop standar hingga laptop gaming, dengan layanan profesional dan terpercaya. Percayakan kepada ahlinya!</p>
                     <a href="https://wa.me/6287823330830?text={{ urlencode('Halo, Saya mau konsultasi mengenai layanan ini. mohon bantuannya...') }}" target="_blank" class="btn btn-secondary mb-2">
-                        <i class="fab fa-whatsapp me-2"></i>Consult with Us
+                        <i class="fab fa-whatsapp me-2"></i>Hubungi Kami Sekarang
                     </a>
                 </section>
 
@@ -21,7 +21,7 @@
         </div>
     </header>
 
-    <section id="keunggulan">
+    <section id="keunggulan" style="background-image: url('{{ asset('images/Bgkeunggulan.png') }}'); background-size: cover;">
         <div class="container">
             <h2 class="header-2 color-navy fw-bold mb-5 text-center">Kenapa Memilih Kami?</h2>
             <div class="row gy-4">
@@ -370,9 +370,6 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
     <section id="cta-penutup" style="background-image: url('{{ asset('images/BGalur.png') }}'); ">
         <div class="container text-center">
             <h1 class="header-2 fw-bold mb-4">Jangan tunggu kerusakan makin parah, segera hubungi kami sekarang!</h1>
-            <a href="#kontak" class="btn btn-primary btn-lg ">Pesan Layanan
-                <i class="fas fa-arrow-down"></i>
-            </a>
         </div>
     </section>
 
@@ -384,78 +381,140 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 <div class="col-lg-5 animate-on-scroll fade-in-left">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h3 class="header-4 color-navy fw-semibold mb-5">Formulir Pemesanan Service</h3>
+                            <h3 class="header-4 color-navy fw-semibold text-center mb-5">Formulir Pemesanan Service</h3>
                             <form id="service-order-form" method="POST" action="{{ route('front.service-order.store') }}">
                                 @csrf
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control" id="name" required placeholder="Contoh: Rizky Maulana">
-                                    <div class="invalid-feedback" id="error-name"></div>
+                                
+                                {{-- Baris Nama dan Nomor HP --}}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label color-navy fw-medium">Nama Lengkap</label>
+                                        <input type="text" name="name" class="form-control" id="name" required placeholder="Contoh: Rizky Maulana">
+                                        <div class="invalid-feedback" id="error-name"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label color-navy fw-medium">Nomor HP / WhatsApp</label>
+                                        <input type="tel" name="phone" class="form-control" id="phone" required placeholder="Contoh: 081234567890">
+                                        <div class="invalid-feedback" id="error-phone"></div>
+                                    </div>
                                 </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="phone" class="form-label">Nomor WhatsApp <span class="text-danger">*</span></label>
-                                    <input type="tel" name="phone" class="form-control" id="phone" required placeholder="Contoh: 081234567890">
-                                    <div class="invalid-feedback" id="error-phone"></div>
-                                </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+
+                                {{-- Email --}}
+                                <div class="mb-3">
+                                    <label for="email" class="form-label color-navy fw-medium">Email</label>
                                     <input type="email" name="email" class="form-control" id="email" required placeholder="Contoh: rizky@mail.com">
                                     <div class="invalid-feedback" id="error-email"></div>
                                 </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="address" class="form-label">Alamat Lengkap <span class="text-danger">*</span></label>
-                                    <textarea name="address" class="form-control" id="address" rows="3" required placeholder="Contoh: Jl. Melati No. 10, RT 03 RW 02, Bandung"></textarea>
-                                    <div class="invalid-feedback" id="error-address"></div>
+
+                                <p class="body-1 color-navy fw-semibold mb-3 mt-3">Alamat</p>
+
+                                {{-- Baris Alamat (Provinsi, Kabupaten/Kota) --}}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="province_id" class="form-label color-navy fw-medium">Provinsi</label>
+                                        <select name="province_id" id="province_id" class="form-select" required>
+                                            <option value="">Pilih Provinsi...</option>
+                                            @if(isset($provinces))
+                                                @foreach($provinces as $province)
+                                                    <option value="{{ $province->id }}">{{ $province->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        <div class="invalid-feedback" id="error-province_id"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="regency_id" class="form-label color-navy fw-medium">Kabupaten/Kota</label>
+                                        <select name="regency_id" id="regency_id" class="form-select" required disabled>
+                                            <option value="">Pilih Kabupaten/Kota...</option>
+                                        </select>
+                                        <div class="invalid-feedback" id="error-regency_id"></div>
+                                    </div>
                                 </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="brand" class="form-label">Merk Perangkat <span class="text-danger">*</span></label>
-                                    <select name="brand" id="brand" class="form-select" required>
-                                        <option value="">Pilih merk Perangkat</option>
-                                        @if(isset($brands) && $brands->count())
-                                            @foreach($brands as $brandOption)
-                                                <option value="{{ $brandOption }}">{{ $brandOption }}</option>
-                                            @endforeach
-                                        @else
-                                            {{-- Fallback to common brands if DB has none --}}
-                                            <option value="Asus">Asus</option>
-                                            <option value="Acer">Acer</option>
-                                            <option value="Lenovo">Lenovo</option>
-                                            <option value="HP">HP</option>
-                                            <option value="Dell">Dell</option>
-                                            <option value="Toshiba">Toshiba</option>
-                                            <option value="Samsung">Samsung</option>
-                                            <option value="Apple">Apple (MacBook)</option>
-                                            <option value="MSI">MSI</option>
-                                            <option value="Alienware">Alienware</option>
-                                        @endif
-                                        <option value="Lainnya">Lainnya</option>
-                                    </select>
-                                    <small class="form-text" style="color: #9ca3af; font-size: 0.8rem;">
-                                        Merk perangkat Anda tidak ada dalam daftar? 
-                                        <a href="https://api.whatsapp.com/send/?phone=6287823330830&text=Halo,%20merk%20laptop%20saya%20tidak%20ada%20dalam%20daftar.%20Apakah%20masih%20bisa%20diservice?" target="_blank" class="text-decoration-none" style="color: #16a085;">
-                                            <i class="fab fa-whatsapp me-1"></i>Hubungi kami via WhatsApp
-                                        </a>
+
+                                {{-- Baris Alamat (Kecamatan, Kelurahan/Desa) --}}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="district_id" class="form-label color-navy fw-medium">Kecamatan</label>
+                                        <select name="district_id" id="district_id" class="form-select" disabled>
+                                            <option value="">Pilih Kecamatan... (Opsional)</option>
+                                        </select>
+                                        <div class="invalid-feedback" id="error-district_id"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="village_id" class="form-label color-navy fw-medium">Desa/Kelurahan</label>
+                                        <select name="village_id" id="village_id" class="form-select" disabled>
+                                            <option value="">Pilih Desa/Kelurahan... (Opsional)</option>
+                                        </select>
+                                        <div class="invalid-feedback" id="error-village_id"></div>
+                                    </div>
+                                </div>
+                                
+                                {{-- Detail Alamat --}}
+                                <div class="mb-3">
+                                    <label for="street_address" class="form-label color-navy fw-medium">Detail alamat</label>
+                                    <textarea name="street_address" class="form-control" id="street_address" rows="3" required placeholder="Tulis nama jalan, nomor rumah, RT/RW, blok, patokan, dll."></textarea>
+                                    <div class="invalid-feedback" id="error-street_address"></div>
+                                </div>
+
+                                {{-- Hidden field untuk alamat lengkap --}}
+                                <input type="hidden" name="address" id="address_hidden" value="">
+
+                                <p class="body-1 color-navy fw-semibold mb-3 mt-3">Detail Perangkat</p>
+
+                                {{-- Baris Merk dan Model Perangkat --}}
+                                <div class="row">
+                                    <div class="col-md-6 mb-0">
+                                        <label for="brand" class="form-label color-navy fw-medium">Merk Perangkat</label>
+                                        <select name="brand" id="brand" class="form-select" required>
+                                            <option value="">Pilih merk Perangkat</option>
+                                            @if(isset($brands) && $brands->count())
+                                                @foreach($brands as $brandOption)
+                                                    <option value="{{ $brandOption }}">{{ $brandOption }}</option>
+                                                @endforeach
+                                            @else
+                                                {{-- Fallback to common brands if DB has none --}}
+                                                <option value="Asus">Asus</option>
+                                                <option value="Acer">Acer</option>
+                                                <option value="Lenovo">Lenovo</option>
+                                                <option value="HP">HP</option>
+                                                <option value="Dell">Dell</option>
+                                                <option value="Toshiba">Toshiba</option>
+                                                <option value="Samsung">Samsung</option>
+                                                <option value="Apple">Apple (MacBook)</option>
+                                                <option value="MSI">MSI</option>
+                                                <option value="Alienware">Alienware</option>
+                                            @endif
+                                            <option value="Lainnya">Lainnya</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-0">
+                                        <label for="model" class="form-label color-navy fw-medium">Model / Series</label>
+                                        <input type="text" name="model" class="form-control" id="model" required placeholder="Contoh: Vivobook A416MA">
+                                        <div class="invalid-feedback" id="error-model"></div>
+                                    </div>
+                                    <small class="form-text" style="color: #9ca3af; font-size: 0.8rem;"> Jika Merk perangkat anda tidak ada, Pilih Opsi Lainnya.
                                     </small>
-                                    <div class="invalid-feedback" id="error-brand"></div>
                                 </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="model" class="form-label">Model / Series <span class="text-danger">*</span></label>
-                                    <input type="text" name="model" class="form-control" id="model" required placeholder="Contoh: Vivobook A416MA">
-                                    <div class="invalid-feedback" id="error-model"></div>
-                                </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="serial_number" class="form-label">Nomor Seri Perangkat <span class="text-danger">*</span></label>
+
+                                {{-- Nomor Seri --}}
+                                <div class="mb-3 mt-3">
+                                    <label for="serial_number" class="form-label color-navy fw-medium">Nomor Seri Perangkat</label>
                                     <input type="text" name="serial_number" class="form-control" id="serial_number" required placeholder="Contoh: SN1234567890">
-                                    <small class="form-text text-muted" style="font-size: 0.8rem;">Biasanya terdapat di bagian bawah laptop atau dalam menu About This PC/Mac</small>
                                     <div class="invalid-feedback" id="error-serial_number"></div>
+                                    <small class="form-text text-muted" style="font-size: 0.8rem;">Biasanya terdapat di bagian bawah laptop atau dalam menu About This PC/Mac</small>
                                 </div>
-                                <div class="body-1 color-navy mb-3">
-                                    <label for="reported_issue" class="form-label">Keluhan / Kerusakan <span class="text-danger">*</span></label>
+                                
+                                {{-- Keluhan --}}
+                                <div class="mb-3">
+                                    <label for="reported_issue" class="form-label color-navy fw-medium">Keluhan / Kerusakan</label>
                                     <textarea name="reported_issue" class="form-control" id="reported_issue" rows="3" required placeholder="Contoh: Laptop tiba-tiba mati total saat digunakan"></textarea>
-                                    <small class="form-text text-muted" style="font-size: 0.8rem;">Jelaskan sedetail mungkin masalah yang dialami</small>
                                     <div class="invalid-feedback" id="error-reported_issue"></div>
+                                    <small class="form-text" style="color: #9ca3af; font-size: 0.8rem;"> Jelaskan sedetail mungkin masalah yang dialami
+                                    </small>
                                 </div>
-                                <div class="d-grid">
+
+                                {{-- Tombol Submit --}}
+                                <div class="d-grid mt-4">
                                     <button type="submit" class="btn btn-primary" id="submit-btn">
                                         <i class="fas fa-paper-plane me-2"></i>Kirim Permintaan
                                     </button>
@@ -706,6 +765,125 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 document.querySelectorAll('.is-invalid').forEach(element => {
                     element.classList.remove('is-invalid');
                 });
+            }
+
+            // IndoRegion Cascading Dropdown Handler
+            const regenciesData = @json(\App\Models\Regency::with('province')->get()->groupBy('province_id'));
+            const districtsData = @json(\App\Models\District::with('regency')->get()->groupBy('regency_id'));
+            const villagesData = @json(\App\Models\Village::with('district')->get()->groupBy('district_id'));
+
+            // Province change handler
+            document.getElementById('province_id').addEventListener('change', function() {
+                const provinceId = this.value;
+                const regencySelect = document.getElementById('regency_id');
+                const districtSelect = document.getElementById('district_id');
+                const villageSelect = document.getElementById('village_id');
+                
+                // Clear regency, district, and village
+                regencySelect.innerHTML = '<option value="">Pilih Kabupaten/Kota...</option>';
+                districtSelect.innerHTML = '<option value="">Pilih Kecamatan... (Opsional)</option>';
+                villageSelect.innerHTML = '<option value="">Pilih Desa/Kelurahan... (Opsional)</option>';
+                
+                // Disable dependent dropdowns
+                regencySelect.disabled = true;
+                districtSelect.disabled = true;
+                villageSelect.disabled = true;
+                
+                if (provinceId && regenciesData[provinceId]) {
+                    // Populate regencies
+                    regenciesData[provinceId].forEach(function(regency) {
+                        regencySelect.innerHTML += `<option value="${regency.id}">${regency.name}</option>`;
+                    });
+                    regencySelect.disabled = false;
+                }
+                updateAddressField();
+            });
+
+            // Regency change handler
+            document.getElementById('regency_id').addEventListener('change', function() {
+                const regencyId = this.value;
+                const districtSelect = document.getElementById('district_id');
+                const villageSelect = document.getElementById('village_id');
+                
+                // Clear districts and villages
+                districtSelect.innerHTML = '<option value="">Pilih Kecamatan... (Opsional)</option>';
+                villageSelect.innerHTML = '<option value="">Pilih Desa/Kelurahan... (Opsional)</option>';
+                
+                // Disable dependent dropdowns
+                districtSelect.disabled = true;
+                villageSelect.disabled = true;
+                
+                if (regencyId && districtsData[regencyId]) {
+                    // Populate districts
+                    districtsData[regencyId].forEach(function(district) {
+                        districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                    });
+                    districtSelect.disabled = false;
+                }
+                updateAddressField();
+            });
+
+            // District change handler
+            document.getElementById('district_id').addEventListener('change', function() {
+                const districtId = this.value;
+                const villageSelect = document.getElementById('village_id');
+                
+                // Clear villages
+                villageSelect.innerHTML = '<option value="">Pilih Desa/Kelurahan... (Opsional)</option>';
+                villageSelect.disabled = true;
+                
+                if (districtId && villagesData[districtId]) {
+                    // Populate villages
+                    villagesData[districtId].forEach(function(village) {
+                        villageSelect.innerHTML += `<option value="${village.id}">${village.name}</option>`;
+                    });
+                    villageSelect.disabled = false;
+                }
+                updateAddressField();
+            });
+
+            // Village change handler
+            document.getElementById('village_id').addEventListener('change', function() {
+                updateAddressField();
+            });
+
+            // Street address change handler
+            document.getElementById('street_address').addEventListener('input', function() {
+                updateAddressField();
+            });
+
+            // Function to update hidden address field with combined address
+            function updateAddressField() {
+                const provinceSelect = document.getElementById('province_id');
+                const regencySelect = document.getElementById('regency_id');
+                const districtSelect = document.getElementById('district_id');
+                const villageSelect = document.getElementById('village_id');
+                const streetAddress = document.getElementById('street_address').value;
+                const hiddenAddress = document.getElementById('address_hidden');
+                
+                let addressParts = [];
+                
+                if (streetAddress) {
+                    addressParts.push(streetAddress);
+                }
+                
+                if (villageSelect.value && villageSelect.selectedOptions[0]) {
+                    addressParts.push(villageSelect.selectedOptions[0].text);
+                }
+                
+                if (districtSelect.value && districtSelect.selectedOptions[0]) {
+                    addressParts.push(districtSelect.selectedOptions[0].text);
+                }
+                
+                if (regencySelect.value && regencySelect.selectedOptions[0]) {
+                    addressParts.push(regencySelect.selectedOptions[0].text);
+                }
+                
+                if (provinceSelect.value && provinceSelect.selectedOptions[0]) {
+                    addressParts.push(provinceSelect.selectedOptions[0].text);
+                }
+                
+                hiddenAddress.value = addressParts.join(', ');
             }
         </script>
     @endpush
@@ -1226,9 +1404,9 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     defaultSubmitBtn.style.display = 'block';
                 }
                 
-                // If brand dropdown, fetch brands from API
+                // If brand dropdown, setup brands with static data
                 if (inputType === 'brand') {
-                    fetchBrands();
+                    setupBrands();
                 }
                 
                 // Add event listener for "Ngga Tau" button if this is model input
@@ -1246,59 +1424,19 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 }
             }
 
-            // Function to fetch brands from database
-            async function fetchBrands() {
-                try {
-                    const response = await fetch('{{ route("front.api.brands") }}');
-                    const result = await response.json();
-                    
-                    const brandSelect = document.getElementById('chat-brand');
-                    
-                    if (result.success && result.data) {
-                        brandSelect.innerHTML = '<option value="">Pilih merek laptop Anda</option>';
-                        
-                        result.data.forEach(brand => {
-                            brandSelect.innerHTML += `<option value="${brand}">${brand}</option>`;
-                        });
-                        
-                        // Add "Lainnya" option
-                        brandSelect.innerHTML += '<option value="Lainnya">Lainnya</option>';
-                    } else {
-                        // Fallback to default brands
-                        brandSelect.innerHTML = `
-                            <option value="">Pilih merek laptop Anda</option>
-                            <option value="Asus">Asus</option>
-                            <option value="Acer">Acer</option>
-                            <option value="Lenovo">Lenovo</option>
-                            <option value="HP">HP</option>
-                            <option value="Dell">Dell</option>
-                            <option value="Toshiba">Toshiba</option>
-                            <option value="Samsung">Samsung</option>
-                            <option value="Apple">Apple (MacBook)</option>
-                            <option value="MSI">MSI</option>
-                            <option value="Alienware">Alienware</option>
-                            <option value="Lainnya">Lainnya</option>
-                        `;
-                    }
-                } catch (error) {
-                    console.error('Error fetching brands:', error);
-                    // Fallback to default brands on error
-                    const brandSelect = document.getElementById('chat-brand');
-                    brandSelect.innerHTML = `
-                        <option value="">Pilih merek laptop Anda</option>
-                        <option value="Asus">Asus</option>
-                        <option value="Acer">Acer</option>
-                        <option value="Lenovo">Lenovo</option>
-                        <option value="HP">HP</option>
-                        <option value="Dell">Dell</option>
-                        <option value="Toshiba">Toshiba</option>
-                        <option value="Samsung">Samsung</option>
-                        <option value="Apple">Apple (MacBook)</option>
-                        <option value="MSI">MSI</option>
-                        <option value="Alienware">Alienware</option>
-                        <option value="Lainnya">Lainnya</option>
-                    `;
-                }
+            // Function to setup brands dropdown with database data
+            function setupBrands() {
+                const brandSelect = document.getElementById('chat-brand');
+                brandSelect.innerHTML = '<option value="">Pilih merek laptop Anda</option>';
+                
+                // Add brands from database
+                @foreach($brands as $brand)
+                    brandSelect.innerHTML += '<option value="{{ $brand }}">{{ $brand }}</option>';
+                @endforeach
+                
+                // Add "Lainnya" option
+                brandSelect.innerHTML += '<option value="Lainnya">Lainnya</option>';
+            }
             }
 
             chatDataForm.onsubmit = function(e) {
@@ -1701,6 +1839,153 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     sessionStorage.removeItem('page_refreshing');
                 }
             });
+        });
+        
+        // IndoRegion Server-side Form System  
+        $(document).ready(function() {
+            // Province change handler - reload page with regency data
+            $('#province_id').on('change', function() {
+                const provinceId = $(this).val();
+                if (provinceId) {
+                    // Show regency group immediately
+                    $('#regency-group').slideDown(300);
+                    
+                    // Create form to reload with regency data
+                    const form = $('<form>', {
+                        method: 'GET',
+                        action: '{{ url("/") }}'
+                    });
+                    
+                    form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'province_id',
+                        value: provinceId
+                    }));
+                    
+                    // Add current form data to preserve it
+                    const name = $('#name').val();
+                    const phone = $('#phone').val();
+                    const email = $('#email').val();
+                    
+                    if (name) form.append($('<input>', {type: 'hidden', name: 'name', value: name}));
+                    if (phone) form.append($('<input>', {type: 'hidden', name: 'phone', value: phone}));
+                    if (email) form.append($('<input>', {type: 'hidden', name: 'email', value: email}));
+                    
+                    $('body').append(form);
+                    form.submit();
+                } else {
+                    hideFieldsAfter('regency-group');
+                }
+                updateAddressField();
+            });
+            
+            // Regency change handler - reload page with district data
+            $('#regency_id').on('change', function() {
+                const regencyId = $(this).val();
+                const provinceId = $('#province_id').val();
+                
+                if (regencyId) {
+                    // Show district group and street address immediately
+                    $('#district-group').slideDown(300);
+                    $('#street-address-group').slideDown(300);
+                    
+                    // Create form to reload with district data
+                    const form = $('<form>', {
+                        method: 'GET',
+                        action: '{{ url("/") }}'
+                    });
+                    
+                    form.append($('<input>', {type: 'hidden', name: 'province_id', value: provinceId}));
+                    form.append($('<input>', {type: 'hidden', name: 'regency_id', value: regencyId}));
+                    
+                    // Add current form data to preserve it
+                    const name = $('#name').val();
+                    const phone = $('#phone').val();
+                    const email = $('#email').val();
+                    const streetAddress = $('#street_address').val();
+                    
+                    if (name) form.append($('<input>', {type: 'hidden', name: 'name', value: name}));
+                    if (phone) form.append($('<input>', {type: 'hidden', name: 'phone', value: phone}));
+                    if (email) form.append($('<input>', {type: 'hidden', name: 'email', value: email}));
+                    if (streetAddress) form.append($('<input>', {type: 'hidden', name: 'street_address', value: streetAddress}));
+                    
+                    $('body').append(form);
+                    form.submit();
+                } else {
+                    hideFieldsAfter('district-group');
+                }
+                updateAddressField();
+            });
+            
+            // District change handler
+            $('#district_id').on('change', function() {
+                updateAddressField();
+            });
+            
+            // Street address change handler
+            $('#street_address').on('input', function() {
+                updateAddressField();
+            });
+            
+            // Populate preserved form data from URL parameters
+            @if(request()->has('name'))
+                $('#name').val('{{ request("name") }}');
+            @endif
+            @if(request()->has('phone'))
+                $('#phone').val('{{ request("phone") }}');
+            @endif
+            @if(request()->has('email'))
+                $('#email').val('{{ request("email") }}');
+            @endif
+            @if(request()->has('street_address'))
+                $('#street_address').val('{{ request("street_address") }}');
+            @endif
+            
+            function hideFieldsAfter(fieldId) {
+                const fields = ['regency-group', 'district-group', 'street-address-group'];
+                const currentIndex = fields.indexOf(fieldId);
+                
+                for (let i = currentIndex; i < fields.length; i++) {
+                    const field = $('#' + fields[i]);
+                    field.slideUp(300);
+                    
+                    // Reset field values
+                    if (fields[i] === 'regency-group') {
+                        $('#regency_id').val('').prop('disabled', true);
+                    } else if (fields[i] === 'district-group') {
+                        $('#district_id').val('').prop('disabled', true);
+                    } else if (fields[i] === 'street-address-group') {
+                        $('#street_address').val('');
+                    }
+                }
+            }
+            
+            function updateAddressField() {
+                const province = $('#province_id option:selected').text();
+                const regency = $('#regency_id option:selected').text();
+                const district = $('#district_id option:selected').text();
+                const streetAddress = $('#street_address').val();
+                
+                let fullAddress = '';
+                
+                if (streetAddress) {
+                    fullAddress = streetAddress;
+                }
+                if (district && district !== 'Pilih Kecamatan... (Opsional)') {
+                    fullAddress += (fullAddress ? ', ' : '') + district;
+                }
+                if (regency && regency !== 'Pilih Kabupaten/Kota...') {
+                    fullAddress += (fullAddress ? ', ' : '') + regency;
+                }
+                if (province && province !== 'Pilih Provinsi...') {
+                    fullAddress += (fullAddress ? ', ' : '') + province;
+                }
+                
+                $('#address').val(fullAddress);
+            }
+            
+            // Initialize address field on page load
+            updateAddressField();
         });
         </script>
     </section>

@@ -5,9 +5,16 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MasterData\DeviceRepair;
-use App\Models\Province;
-use App\Models\Regency;
-use App\Models\District;
+use App\Models\Region\Province;
+use App\Models\Region\Regency;
+use App\Models\Region\District;
+use App\Models\Cms\HeroSection;
+use App\Models\Cms\Advantage;
+use App\Models\Cms\AdvantageSection;
+use App\Models\Cms\Service;
+use App\Models\Cms\ServiceSection;
+use App\Models\Cms\Step;
+use App\Models\Cms\StepSection;
 
 class HomeController extends Controller
 {
@@ -19,6 +26,27 @@ class HomeController extends Controller
      */
     public function __invoke(Request $request)
     {
+        // Get active hero section
+        $heroSection = HeroSection::active()->first();
+
+        // Get active advantages (all active advantages, ordered)
+        $advantages = Advantage::active()->ordered()->get();
+        
+        // Get active advantage section
+        $advantageSection = AdvantageSection::active()->first();
+        
+        // Get active services (all active services, ordered)
+        $services = Service::active()->ordered()->get();
+        
+        // Get active service section
+        $serviceSection = ServiceSection::active()->first();
+        
+        // Get active steps (all active steps, ordered)
+        $steps = Step::active()->ordered()->get();
+        
+        // Get active step section
+        $stepSection = StepSection::active()->first();
+
         // Get distinct non-empty brands from device_repairs table, ordered alphabetically
         $brands = DeviceRepair::query()
             ->whereNotNull('brand')
@@ -31,7 +59,7 @@ class HomeController extends Controller
         // Get provinces for address selection
         $provinces = Province::orderBy('name')->get();
 
-        return view('front.home.index', compact('brands', 'provinces'));
+        return view('front.home.index', compact('heroSection', 'advantages', 'advantageSection', 'services', 'serviceSection', 'steps', 'stepSection', 'brands', 'provinces'));
     }
 
     public function cekStatus(Request $request)

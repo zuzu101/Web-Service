@@ -7,11 +7,10 @@
  *
  */
 
-namespace App\Models;
+namespace App\Models\Region;
 
 use AzisHapidin\IndoRegion\Traits\VillageTrait;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\District;
 
 /**
  * Village Model.

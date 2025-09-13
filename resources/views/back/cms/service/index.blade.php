@@ -1,0 +1,331 @@
+@extends('layouts.admin.app')
+
+@section('header')
+<header class="container-fluid">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Kelola Layanan</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Kelola Layanan</li>
+            </ol>
+        </div>
+    </div>
+</header>
+@endsection
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Kelola Layanan</h3>
+                    <div class="card-tools">
+                        <a href="{{ route('admin.cms.service-section.index') }}" class="btn btn-secondary btn-sm me-2">
+                            <i class="fas fa-cog"></i> Pengaturan Section
+                        </a>
+                        <a href="{{ route('admin.cms.service.reorderPage') }}" class="btn btn-info btn-sm me-2">
+                            <i class="fas fa-sort"></i> Atur Urutan
+                        </a>
+                        <a href="{{ route('admin.cms.service.create') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Tambah Layanan
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Quick Edit Section Title -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <form id="quickEditSectionForm" class="d-flex align-items-center">
+                                @csrf
+                                <label for="sectionTitle" class="form-label me-3 mb-0 fw-bold">Judul Section:</label>
+                                <input type="text" 
+                                       id="sectionTitle" 
+                                       name="title" 
+                                       class="form-control me-3" 
+                                       placeholder="Contoh: Layanan Kami"
+                                       style="max-width: 300px;">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-save"></i> Simpan
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Judul akan tampil di halaman website
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="table-responsive">
+                        <table id="serviceTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th width="15%">Gambar</th>
+                                    <th width="20%">Judul</th>
+                                    <th width="35%">Deskripsi</th>
+                                    <th width="10%">Status</th>
+                                    <th width="15%">Aksi</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('css')
+<link rel="stylesheet" href="{{ asset('back_assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('back_assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+@endpush
+
+@push('js')
+<script src="{{ asset('back_assets/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('back_assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('back_assets/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('back_assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+$(function () {
+    // Load current section title
+    loadSectionTitle();
+
+    $('#serviceTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route('admin.cms.service.index') }}',
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'image', name: 'image', orderable: false, searchable: false},
+            {data: 'title', name: 'title'},
+            {data: 'description', name: 'description'},
+            {data: 'status', name: 'is_active'},
+            {data: 'action', name: 'action', orderable: false, searchable: false}
+        ],
+        responsive: true,
+        language: {
+            url: '{{ asset('back_assets/plugins/datatables/id.json') }}'
+        }
+    });
+
+    // Handle quick edit section title form
+    $('#quickEditSectionForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const title = $('#sectionTitle').val().trim();
+        if (!title) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan!',
+                text: 'Judul section tidak boleh kosong.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        // Show loading
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+
+        $.ajax({
+            url: '{{ route('admin.cms.service-section.updateTitle') }}',
+            type: 'POST',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'title': title
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: response.message,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            },
+            error: function(xhr) {
+                let errorMessage = 'Terjadi kesalahan saat menyimpan judul';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: errorMessage,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            },
+            complete: function() {
+                // Restore button
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+});
+
+function loadSectionTitle() {
+    $.ajax({
+        url: '{{ route('admin.cms.service-section.getTitle') }}',
+        type: 'GET',
+        success: function(response) {
+            if (response.success && response.title) {
+                $('#sectionTitle').val(response.title);
+            }
+        },
+        error: function() {
+            // If no section exists, leave empty
+            $('#sectionTitle').attr('placeholder', 'Belum ada judul section');
+        }
+    });
+}
+
+function deleteService(id) {
+    Swal.fire({
+        title: 'Hapus Layanan?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '{{ route('admin.cms.service.destroy', ':id') }}'.replace(':id', id),
+                type: 'DELETE',
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        $('#serviceTable').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Terjadi kesalahan saat menghapus data';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMessage,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+}
+
+function toggleStatus(id) {
+    Swal.fire({
+        title: 'Ubah Status Layanan?',
+        text: "Status akan diubah antara aktif dan nonaktif",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Ubah!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '{{ route('admin.cms.service.toggleStatus', ':id') }}'.replace(':id', id),
+                type: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: response.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        $('#serviceTable').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: response.message,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Terjadi kesalahan saat mengubah status';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMessage,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+}
+</script>
+@endpush

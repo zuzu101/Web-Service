@@ -200,19 +200,16 @@
     }
     .result-card {
         padding: 20px 15px;
-    }
-    .result-card .d-flex {
         font-size: 16px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+        align-items: center;
     }
     .result-card .d-flex h5{
-        font-size: 20px;
+        font-size: 16px;
     }
     .result-card .status-badge {
         margin-top: 0;
-        align-self: flex-start; /* Align to start on mobile */
+        font-size: 14px;
+        align-self: flex-start;
     }
     .result-card .detail-section strong {
         font-size: 16px;
@@ -221,5 +218,6 @@
         font-size: 16px;
     }
     /* End Hasil Lacak */
+
 }
 /* End Responsif */

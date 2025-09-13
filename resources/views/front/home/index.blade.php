@@ -1,125 +1,212 @@
-﻿<x-client.layout>
+<x-client.layout>
     <header id="hero">
         <div class="container">
             <div class="row align-items-center justify-content-center text-center text-lg-start">
                 
                 <section class="col-lg-7 animate-on-scroll fade-in-left">
-                    <h1 class="header-1 color-navy fw-bold mb-0">Service Laptop</h1>
-                    <h1 class="header-1 color-accent fw-bold mb-4">Cepat, Jujur, dan Bergaransi</h1>
-                    <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid d-lg-none hero-img" alt="Teknisi sedang bekerja">
-                    <p class="body-1 color-navy fw-normal mb-4 ">Kami siap membantu mengatasi berbagai masalah pada perangkat Anda, mulai dari laptop standar hingga laptop gaming, dengan layanan profesional dan terpercaya. Percayakan kepada ahlinya!</p>
+                    @if($heroSection)
+                        <h1 class="header-1 color-navy fw-bold mb-0">{{ $heroSection->title }}</h1>
+                        @if($heroSection->title2)
+                            <h1 class="header-1 color-accent fw-bold mb-4">{{ $heroSection->title2 }}</h1>
+                        @endif
+                        @if($heroSection->image1)
+                            <img src="{{ $heroSection->image1_url }}" class="img-fluid d-lg-none hero-img" alt="{{ $heroSection->title }}">
+                        @endif
+                        <p class="body-1 color-navy fw-normal mb-4">{{ $heroSection->description }}</p>
+                    @else
+                        {{-- Fallback content jika tidak ada hero section aktif --}}
+                        <h1 class="header-1 color-navy fw-bold mb-0">Service Laptop</h1>
+                        <h1 class="header-1 color-accent fw-bold mb-4">Cepat, Jujur, dan Bergaransi</h1>
+                        <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid d-lg-none hero-img" alt="Teknisi sedang bekerja">
+                        <p class="body-1 color-navy fw-normal mb-4">Kami siap membantu mengatasi berbagai masalah pada perangkat Anda, mulai dari laptop standar hingga laptop gaming, dengan layanan profesional dan terpercaya. Percayakan kepada ahlinya!</p>
+                    @endif
                     <a href="https://wa.me/6287823330830?text={{ urlencode('Halo, Saya mau konsultasi mengenai layanan ini. mohon bantuannya...') }}" target="_blank" class="btn btn-secondary mb-2">
                         <i class="fab fa-whatsapp me-2"></i>Hubungi Kami Sekarang
                     </a>
                 </section>
 
                 <section class="col-lg-5 d-none d-lg-block animate-on-scroll fade-in-right">
-                    <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid mb-32 mx-auto d-block hero-img" alt="Teknisi sedang bekerja">
+                    @if($heroSection && $heroSection->image1)
+                        <img src="{{ $heroSection->image1_url }}" class="img-fluid mb-32 mx-auto d-block hero-img" alt="{{ $heroSection->title }}">
+                    @else
+                        {{-- Fallback image jika tidak ada hero section aktif --}}
+                        <img src="{{ asset('images\HeroImage.png') }}" class="img-fluid mb-32 mx-auto d-block hero-img" alt="Teknisi sedang bekerja">
+                    @endif
                 </section>
 
             </div>
         </div>
     </header>
 
-    <section id="keunggulan" style="background-image: url('{{ asset('images/Bgkeunggulan.png') }}'); background-size: cover;">
+    <section id="keunggulan" style="background-image: url('{{ $advantageSection && $advantageSection->background_image ? $advantageSection->background_image_url : asset('images/Bgkeunggulan.png') }}'); background-size: cover;">
         <div class="container">
-            <h2 class="header-2 color-navy fw-bold mb-5 text-center">Kenapa Memilih Kami?</h2>
+            <h2 class="header-2 color-navy fw-bold mb-5 text-center">
+                {{ $advantageSection && $advantageSection->title ? $advantageSection->title : 'Kenapa Memilih Kami?' }}
+            </h2>
             <div class="row gy-4">
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="keunggulan-item-box animate-on-scroll fade-in-up">
-                        <div class="keunggulan-ic-container flex-shrink-0 me-2 ">
-                            <img src="{{ asset('images/garansi.png') }}" class="img-fluid" alt="garansi">
-                        </div> 
-                        <div>
-                            <h3 class="body-1 color-navy fw-bold mb-2">Garansi Service</h3>
-                            <p class="body-1 color-navy mb-0">Garansi hingga 30 hari setelah service.</p>
+                @if($advantages && $advantages->count() > 0)
+                    @php
+                        $advantageCount = $advantages->count();
+                        // Determine column classes based on count
+                        if ($advantageCount <= 2) {
+                            $colClass = 'col-md-6 col-lg-6';
+                        } elseif ($advantageCount == 3) {
+                            $colClass = 'col-md-6 col-lg-4';
+                        } elseif ($advantageCount == 4) {
+                            $colClass = 'col-6 col-md-6 col-lg-3';
+                        } elseif ($advantageCount <= 6) {
+                            $colClass = 'col-6 col-md-4 col-lg-4';
+                        } else {
+                            $colClass = 'col-6 col-md-4 col-lg-3';
+                        }
+                    @endphp
+                    
+                    @foreach($advantages as $index => $advantage)
+                        @php
+                            // Calculate delay for animation (support unlimited items)
+                            $delayIndex = ($index % 4) + 1; // Cycle through delay-1 to delay-4
+                            $delayClass = $index > 0 ? 'delay-'.$delayIndex : '';
+                        @endphp
+                        <div class="{{ $colClass }}">
+                            <div class="keunggulan-item-box animate-on-scroll fade-in-up {{ $delayClass }}">
+                                <div class="keunggulan-ic-container flex-shrink-0 me-2">
+                                    @if($advantage->icon)
+                                        <img src="{{ $advantage->icon_url }}" class="img-fluid" alt="{{ $advantage->title }}">
+                                    @else
+                                        <img src="{{ asset('images/garansi.png') }}" class="img-fluid" alt="{{ $advantage->title }}">
+                                    @endif
+                                </div> 
+                                <div>
+                                    <h3 class="body-1 color-navy fw-bold mb-2">{{ $advantage->title }}</h3>
+                                    <p class="body-1 color-navy mb-0">{{ $advantage->description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    {{-- Fallback content jika tidak ada advantages aktif --}}
+                    <div class="col-6 col-md-6 col-lg-3">
+                        <div class="keunggulan-item-box animate-on-scroll fade-in-up">
+                            <div class="keunggulan-ic-container flex-shrink-0 me-2 ">
+                                <img src="{{ asset('images/garansi.png') }}" class="img-fluid" alt="garansi">
+                            </div> 
+                            <div>
+                                <h3 class="body-1 color-navy fw-bold mb-2">Garansi Service</h3>
+                                <p class="body-1 color-navy mb-0">Garansi hingga 30 hari setelah service.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-1">
-                        <div class="keunggulan-ic-container flex-shrink-0 me-2 ">
-                            <img src="{{ asset('images/teknisi.png') }}" class="img-fluid" alt="teknisi">
-                        </div>
-                        <div>
-                            <h3 class="body-1 color-navy fw-bold mb-2">Teknisi Berpengalaman</h3>
-                            <p class="body-1 color-navy mb-0">Dikerjakan oleh teknisi profesional.</p>
+                    <div class="col-6 col-md-6 col-lg-3">
+                        <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-1">
+                            <div class="keunggulan-ic-container flex-shrink-0 me-2 ">
+                                <img src="{{ asset('images/teknisi.png') }}" class="img-fluid" alt="teknisi">
+                            </div>
+                            <div>
+                                <h3 class="body-1 color-navy fw-bold mb-2">Teknisi Berpengalaman</h3>
+                                <p class="body-1 color-navy mb-0">Dikerjakan oleh teknisi profesional.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-2">
-                        <div class="keunggulan-ic-container flex-shrink-0 me-2">
-                            <img src="{{ asset('images/gear.png') }}" class="img-fluid" alt="sparepart">
-                        </div>
-                        <div>
-                            <h3 class="body-1 color-navy fw-bold mb-2">Sparepart Original</h3>
-                            <p class="body-1 color-navy mb-0">Hanya menggunakan komponen original.</p>
+                    <div class="col-6 col-md-6 col-lg-3">
+                        <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-2">
+                            <div class="keunggulan-ic-container flex-shrink-0 me-2">
+                                <img src="{{ asset('images/gear.png') }}" class="img-fluid" alt="sparepart">
+                            </div>
+                            <div>
+                                <h3 class="body-1 color-navy fw-bold mb-2">Sparepart Original</h3>
+                                <p class="body-1 color-navy mb-0">Hanya menggunakan komponen original.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-6 col-md-6 col-lg-3">
-                    <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-3">
-                        <div class="keunggulan-ic-container flex-shrink-0 me-2">
-                            <img src="{{ asset('images/konsul.png') }}" class="img-fluid" alt="konsultasi">
-                        </div>
-                        <div>
-                            <h3 class="body-1 color-navy fw-bold mb-2">Gratis Cek & Konsultasi</h3>
-                            <p class="body-1 color-navy mb-0">Konsultasi bebas biaya, langsung WA.</p>
+                    <div class="col-6 col-md-6 col-lg-3">
+                        <div class="keunggulan-item-box animate-on-scroll fade-in-up delay-3">
+                            <div class="keunggulan-ic-container flex-shrink-0 me-2">
+                                <img src="{{ asset('images/konsul.png') }}" class="img-fluid" alt="konsultasi">
+                            </div>
+                            <div>
+                                <h3 class="body-1 color-navy fw-bold mb-2">Gratis Cek & Konsultasi</h3>
+                                <p class="body-1 color-navy mb-0">Konsultasi bebas biaya, langsung WA.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </section>
 
     <section id="layanan">
         <div class="container">
-            <h2 class="header-2 color-navy fw-bold mb-2 text-center animate-on-scroll fade-in-up">Semua Kebutuhan Service dalam Satu Tempat</h2>
-            <p class="body-1 color-navy fw-normal mb-5 text-center animate-on-scroll fade-in-up delay-1">Solusi lengkap untuk semua masalah perangkat elektronik Anda</p>
+            @if($serviceSection)
+                <h2 class="header-2 color-navy fw-bold mb-2 text-center animate-on-scroll fade-in-up">{{ $serviceSection->title }}</h2>
+                @if($serviceSection->subtitle)
+                    <p class="body-1 color-navy fw-normal mb-5 text-center animate-on-scroll fade-in-up delay-1">{{ $serviceSection->subtitle }}</p>
+                @endif
+            @else
+                <h2 class="header-2 color-navy fw-bold mb-2 text-center animate-on-scroll fade-in-up">Semua Kebutuhan Service dalam Satu Tempat</h2>
+                <p class="body-1 color-navy fw-normal mb-5 text-center animate-on-scroll fade-in-up delay-1">Solusi lengkap untuk semua masalah perangkat elektronik Anda</p>
+            @endif
 
             <div class="glide-layanan animate-on-scroll fade-in-up delay-2">
                 <div class="glide__track" data-glide-el="track">
                     <ul class="glide__slides">
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/hardware.png') }}" class="card-img-top" alt="Service Hardware">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Hardware</h3>
-                                    <p class="body-1-card color-navy">Ganti LCD, keyboard, upgrade RAM/SSD, dll.</p>
+                        @if($services && $services->count() > 0)
+                            @foreach($services as $service)
+                                <li class="glide__slide">
+                                    <div class="card h-100 shadow-sm">
+                                        @if($service->image)
+                                            <img src="{{ $service->image_url }}" class="card-img-top" alt="{{ $service->title }}">
+                                        @else
+                                            <img src="{{ asset('images/default-service.png') }}" class="card-img-top" alt="{{ $service->title }}">
+                                        @endif
+                                        <div class="card-body text-center">
+                                            <h3 class="card-title header-4 color-navy fw-semibold mb-2">{{ $service->title }}</h3>
+                                            <p class="body-1-card color-navy">{{ $service->description }}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        @else
+                            <!-- Fallback content when no services in database -->
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/hardware.png') }}" class="card-img-top" alt="Service Hardware">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Hardware</h3>
+                                        <p class="body-1-card color-navy">Ganti LCD, keyboard, upgrade RAM/SSD, dll.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/software.png') }}" class="card-img-top" alt="Service Software">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Software</h3>
-                                    <p class="body-1-card color-navy">Install ulang, recovery data, pasang antivirus.</p>
+                            </li>
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/software.png') }}" class="card-img-top" alt="Service Software">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Software</h3>
+                                        <p class="body-1-card color-navy">Install ulang, recovery data, pasang antivirus.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/clean.png') }}" class="card-img-top" alt="Maintenance & Cleaning">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title header-4 color-navy fw-semibold mb-2">Maintenance & Cleaning</h3>
-                                    <p class="body-1-card color-navy">Bersihkan laptop dari debu, thermal paste, dll.</p>
+                            </li>
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/clean.png') }}" class="card-img-top" alt="Maintenance & Cleaning">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title header-4 color-navy fw-semibold mb-2">Maintenance & Cleaning</h3>
+                                        <p class="body-1-card color-navy">Bersihkan laptop dari debu, thermal paste, dll.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/printer.png') }}" class="card-img-top" alt="Service Printer & PC">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Printer & PC</h3>
-                                    <p class="body-1-card color-navy">Untuk printer rumah/kantor, juga PC rakitan.</p>
+                            </li>
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/printer.png') }}" class="card-img-top" alt="Service Printer & PC">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title header-4 color-navy fw-semibold mb-2">Service Printer & PC</h3>
+                                        <p class="body-1-card color-navy">Untuk printer rumah/kantor, juga PC rakitan.</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>
+                        @endif
                     </ul>
                 </div>
 
@@ -142,52 +229,76 @@
         </div>
     </section>
  
-    <section id="alur" style="background-image: url('{{ asset('images/BGalur.png') }}');">
+    <section id="alur" style="background-image: url('{{ $stepSection && $stepSection->background_image ? $stepSection->background_image_url : asset('images/BGalur.png') }}');">
         <div class="container">
             <div class="row gx-4 gy-4 animate-on-scroll fade-in-left"> 
                 <div class="col-lg-4">
-                    <h2 class="header-2 color-neutral fw-bold mb-3">3 Langkah Mudah Layanan Kami</h2>
-                    <p class="body-1 color-neutral fw-normal">Ikuti alur sederhana kami untuk mendapatkan layanan perbaikan yang cepat dan efisien.</p>
+                    <h2 class="header-2 color-neutral fw-bold mb-3">
+                        {{ $stepSection && $stepSection->title ? $stepSection->title : '3 Langkah Mudah Layanan Kami' }}
+                    </h2>
+                    <p class="body-1 color-neutral fw-normal">
+                        {{ $stepSection && $stepSection->subtitle ? $stepSection->subtitle : 'Ikuti alur sederhana kami untuk mendapatkan layanan perbaikan yang cepat dan efisien.' }}
+                    </p>
                 </div>
 
                 <div class="col-lg-8">
                     <div class="row aligm-items-start gx-4 gy-4">
-
-                        <div class="col-md-4 mb-3 animate-on-scroll fade-in-up">
-                            <div class="card border-0 text-center h-100">
-                                <div class="card-body p-4">
-                                    <div class="justify-content-center d-flex mb-2">
-                                        <img src="{{ asset('images\konsultasi.png') }}" class="img-fluid mb-2" alt="konsultasi">
+                        @if($steps && $steps->count() > 0)
+                            @foreach($steps as $index => $step)
+                                <div class="col-md-4 mb-3 animate-on-scroll fade-in-up{{ $index > 0 ? ' delay-' . $index : '' }}">
+                                    <div class="card border-0 text-center h-100">
+                                        <div class="card-body p-4">
+                                            <div class="justify-content-center d-flex mb-2">
+                                                @if($step->icon)
+                                                    <img src="{{ $step->icon_url }}" class="img-fluid mb-2" alt="{{ $step->title }}">
+                                                @else
+                                                    <img src="{{ asset('images/konsultasi.png') }}" class="img-fluid mb-2" alt="{{ $step->title }}">
+                                                @endif
+                                            </div>
+                                            <h4 class="header-4 color-accent fw-semibold mb-3">{{ $step->title }}</h4>
+                                            <p class="body-1-card color-navy">{{ $step->description }}</p>
+                                        </div>
                                     </div>
-                                    <h4 class="header-4 color-accent fw-semibold mb-3">Konsultasi Kerusakan</h4>
-                                    <p class="body-1-card color-navy">Hubungi kami dan sampaikan masalah yang terjadi pada perangkat Anda</p>
+                                </div>
+                            @endforeach
+                        @else
+                            {{-- Fallback content jika tidak ada steps aktif --}}
+                            <div class="col-md-4 mb-3 animate-on-scroll fade-in-up">
+                                <div class="card border-0 text-center h-100">
+                                    <div class="card-body p-4">
+                                        <div class="justify-content-center d-flex mb-2">
+                                            <img src="{{ asset('images/konsultasi.png') }}" class="img-fluid mb-2" alt="konsultasi">
+                                        </div>
+                                        <h4 class="header-4 color-accent fw-semibold mb-3">Konsultasi Kerusakan</h4>
+                                        <p class="body-1-card color-navy">Hubungi kami dan sampaikan masalah yang terjadi pada perangkat Anda</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-4 mb-3 animate-on-scroll fade-in-up delay-1">
-                            <div class="card border-0 text-center h-100">
-                                <div class="card-body p-4">
-                                    <div class="justify-content-center d-flex mb-2">
-                                        <img src="{{ asset('images\pengerjaan.png') }}" class="img-fluid mb-2" alt="pengerjaan teknisi">
+                            <div class="col-md-4 mb-3 animate-on-scroll fade-in-up delay-1">
+                                <div class="card border-0 text-center h-100">
+                                    <div class="card-body p-4">
+                                        <div class="justify-content-center d-flex mb-2">
+                                            <img src="{{ asset('images/pengerjaan.png') }}" class="img-fluid mb-2" alt="pengerjaan teknisi">
+                                        </div>
+                                        <h4 class="header-4 color-accent fw-semibold mb-3">Pengerjaan Teknisi</h4>
+                                        <p class="body-1-card color-navy">Teknisi ahli kami akan segera menganalisa dan memperbaiki masalahnya.</p>
                                     </div>
-                                    <h4 class="header-4 color-accent fw-semibold mb-3">Pengerjaan Teknisi</h4>
-                                    <p class="body-1-card color-navy">Teknisi ahli kami akan segera menganalisa dan memperbaiki masalahnya.</p>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-4 mb-3 animate-on-scroll fade-in-up delay-2">
-                            <div class="card border-0 text-center h-100">
-                                <div class="card-body p-4">
-                                    <div class="justify-content-center d-flex mb-2">
-                                        <img src="{{ asset('images\selesai.png') }}" class="img-fluid mb-2" alt="unit siap diambil">
+                            <div class="col-md-4 mb-3 animate-on-scroll fade-in-up delay-2">
+                                <div class="card border-0 text-center h-100">
+                                    <div class="card-body p-4">
+                                        <div class="justify-content-center d-flex mb-2">
+                                            <img src="{{ asset('images/selesai.png') }}" class="img-fluid mb-2" alt="unit siap diambil">
+                                        </div>
+                                        <h4 class="header-4 color-accent fw-semibold mb-3">Unit Siap Diambil</h4>
+                                        <p class="body-1-card color-navy">Kami akan menghubungi Anda jika perangkat sudah selesai diperbaiki.</p>
                                     </div>
-                                    <h4 class="header-4 color-accent fw-semibold mb-3">Unit Siap Diambil</h4>
-                                    <p class="body-1-card color-navy">Kami akan menghubungi Anda jika perangkat sudah selesai diperbaiki.</p>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -247,10 +358,10 @@
 Halo, saya tertarik dengan promo maintenance rutin yang menawarkan hemat hingga 20%.
 
 Saya ingin mengetahui lebih lanjut tentang:
-• Pembersihan menyeluruh sistem
-• Update software terbaru
-• Optimasi performa
-• Garansi layanan 30 hari
+� Pembersihan menyeluruh sistem
+� Update software terbaru
+� Optimasi performa
+� Garansi layanan 30 hari
 
 Mohon informasi jadwal dan estimasi biaya. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Jadwalkan Sekarang</a>
                             </div>
@@ -275,10 +386,10 @@ Mohon informasi jadwal dan estimasi biaya. Terima kasih!') }}" target="_blank" c
 Halo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.
 
 Kami membutuhkan informasi tentang:
-• Layanan on-site gratis
-• Harga khusus untuk bulk service
-• Support teknis 24/7
-• Maintenance kontrak tahunan
+� Layanan on-site gratis
+� Harga khusus untuk bulk service
+� Support teknis 24/7
+� Maintenance kontrak tahunan
 
 Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Hubungi Tim Corporate</a>
                             </div>
@@ -768,9 +879,9 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             }
 
             // IndoRegion Cascading Dropdown Handler
-            const regenciesData = @json(\App\Models\Regency::with('province')->get()->groupBy('province_id'));
-            const districtsData = @json(\App\Models\District::with('regency')->get()->groupBy('regency_id'));
-            const villagesData = @json(\App\Models\Village::with('district')->get()->groupBy('district_id'));
+            const regenciesData = @json(\App\Models\Region\Regency::with('province')->get()->groupBy('province_id'));
+            const districtsData = @json(\App\Models\Region\District::with('regency')->get()->groupBy('regency_id'));
+            const villagesData = @json(\App\Models\Region\Village::with('district')->get()->groupBy('district_id'));
 
             // Province change handler
             document.getElementById('province_id').addEventListener('change', function() {
@@ -1093,7 +1204,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     messagesContainer.innerHTML = ''; // Clear any corrupted content
                     
                     setTimeout(() => {
-                        addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
+                        addBotMessage('Halo! Saya LASO, asisten virtual LaptopService ??');
                         setTimeout(() => {
                             addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
                                 {text: 'Service Laptop', action: 'service_laptop'},
@@ -1213,16 +1324,16 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     }, 1000);
                 } else if (action === 'promo_maintenance') {
                     setTimeout(() => {
-                        addBotMessage('🎉 Promo Maintenance Rutin! Hemat hingga 20% untuk perawatan berkala:\n\n• Pembersihan menyeluruh sistem\n• Update software terbaru\n• Optimasi performa\n• Garansi layanan 30 hari\n\nMau langsung booking maintenance atau lanjut service biasa?', true, [
-                            {text: '📅 Booking Maintenance', action: 'booking_maintenance'},
-                            {text: '🔧 Lanjut Service Biasa', action: 'skip_promo'}
+                        addBotMessage('?? Promo Maintenance Rutin! Hemat hingga 20% untuk perawatan berkala:\n\n� Pembersihan menyeluruh sistem\n� Update software terbaru\n� Optimasi performa\n� Garansi layanan 30 hari\n\nMau langsung booking maintenance atau lanjut service biasa?', true, [
+                            {text: '?? Booking Maintenance', action: 'booking_maintenance'},
+                            {text: '?? Lanjut Service Biasa', action: 'skip_promo'}
                         ]);
                     }, 1000);
                 } else if (action === 'promo_corporate') {
                     setTimeout(() => {
-                        addBotMessage('🏢 Voucher Perusahaan! Khusus untuk kebutuhan kantor:\n\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nMau konsultasi corporate atau lanjut service individu?', true, [
-                            {text: '💼 Konsultasi Corporate', action: 'corporate_consultation'},
-                            {text: '👤 Service Individu', action: 'skip_promo'}
+                        addBotMessage('?? Voucher Perusahaan! Khusus untuk kebutuhan kantor:\n\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nMau konsultasi corporate atau lanjut service individu?', true, [
+                            {text: '?? Konsultasi Corporate', action: 'corporate_consultation'},
+                            {text: '?? Service Individu', action: 'skip_promo'}
                         ]);
                     }, 1000);
                 } else if (action === 'booking_maintenance') {
@@ -1234,7 +1345,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 } else if (action === 'corporate_consultation') {
                     setTimeout(() => {
                         addBotMessage('Terima kasih! Untuk konsultasi corporate, saya akan hubungkan dengan tim khusus kami.');
-                        sendToWhatsApp('*KONSULTASI CORPORATE*\n\nHalo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.\n\nKami membutuhkan informasi tentang:\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nMohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!');
+                        sendToWhatsApp('*KONSULTASI CORPORATE*\n\nHalo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.\n\nKami membutuhkan informasi tentang:\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nMohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!');
                     }, 1000);
                 } else if (action === 'skip_promo') {
                     setTimeout(() => {
@@ -1247,13 +1358,13 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     
                     if (action === 'laptop_on') {
                         conditionText = 'Masih menyala normal';
-                        responseMessage = 'Bagus sekali! Laptop yang masih menyala memudahkan proses diagnosis dan biasanya lebih cepat selesai 👍';
+                        responseMessage = 'Bagus sekali! Laptop yang masih menyala memudahkan proses diagnosis dan biasanya lebih cepat selesai ??';
                     } else if (action === 'laptop_partially') {
                         conditionText = 'Menyala tapi bermasalah';
-                        responseMessage = 'Oke, laptop masih hidup tapi ada gangguannya ya. Ini sebenarnya kondisi yang baik untuk diperbaiki 💪';
+                        responseMessage = 'Oke, laptop masih hidup tapi ada gangguannya ya. Ini sebenarnya kondisi yang baik untuk diperbaiki ??';
                     } else {
                         conditionText = 'Tidak bisa menyala';
-                        responseMessage = 'Hmm, laptop mati total memang tricky. Tapi tenang, teknisi kami sudah berpengalaman puluhan tahun menangani kasus seperti ini! 🔧';
+                        responseMessage = 'Hmm, laptop mati total memang tricky. Tapi tenang, teknisi kami sudah berpengalaman puluhan tahun menangani kasus seperti ini! ??';
                     }
                     
                     userInputs.condition = conditionText;
@@ -1267,16 +1378,16 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     }, 1000);
                 } else if (action === 'show_promo_maintenance') {
                     setTimeout(() => {
-                        addBotMessage('🎉 Promo Maintenance Rutin!\n\nHemat hingga 20% untuk perawatan berkala laptop Anda:\n• Pembersihan menyeluruh sistem\n• Update software terbaru\n• Optimasi performa\n• Garansi layanan 30 hari\n\nApakah Anda tertarik dengan promo ini?', true, [
-                            {text: '✅ Ya, Tertarik!', action: 'interested_maintenance'},
-                            {text: '⏭️ Tidak, Lanjut Service', action: 'continue_to_name'}
+                        addBotMessage('?? Promo Maintenance Rutin!\n\nHemat hingga 20% untuk perawatan berkala laptop Anda:\n� Pembersihan menyeluruh sistem\n� Update software terbaru\n� Optimasi performa\n� Garansi layanan 30 hari\n\nApakah Anda tertarik dengan promo ini?', true, [
+                            {text: '? Ya, Tertarik!', action: 'interested_maintenance'},
+                            {text: '?? Tidak, Lanjut Service', action: 'continue_to_name'}
                         ]);
                     }, 1000);
                 } else if (action === 'show_promo_corporate') {
                     setTimeout(() => {
-                        addBotMessage('🏢 Voucher Perusahaan!\n\nLayanan khusus untuk kebutuhan kantor:\n• Layanan on-site gratis\n• Harga khusus untuk bulk service\n• Support teknis 24/7\n• Maintenance kontrak tahunan\n\nApakah ini untuk kebutuhan perusahaan?', true, [
-                            {text: '✅ Ya, Untuk Perusahaan', action: 'corporate_interest'},
-                            {text: '👤 Tidak, Service Pribadi', action: 'continue_to_name'}
+                        addBotMessage('?? Voucher Perusahaan!\n\nLayanan khusus untuk kebutuhan kantor:\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nApakah ini untuk kebutuhan perusahaan?', true, [
+                            {text: '? Ya, Untuk Perusahaan', action: 'corporate_interest'},
+                            {text: '?? Tidak, Service Pribadi', action: 'continue_to_name'}
                         ]);
                     }, 1000);
                 } else if (action === 'interested_maintenance') {
@@ -1310,14 +1421,14 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     // Copy message to clipboard as fallback
                     let message = userInputs.finalMessage || '';
                     if (userInputs.notaNumber) {
-                        message += `\n\n*📋 NOMOR NOTA: ${userInputs.notaNumber}*\n`;
+                        message += `\n\n*?? NOMOR NOTA: ${userInputs.notaNumber}*\n`;
                         message += `_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_`;
                     }
                     
                     navigator.clipboard.writeText(message).then(() => {
-                        addBotMessage('✅ Pesan berhasil disalin! Silakan paste di WhatsApp manual ke: 087823330830');
+                        addBotMessage('? Pesan berhasil disalin! Silakan paste di WhatsApp manual ke: 087823330830');
                     }).catch(() => {
-                        addBotMessage('❌ Gagal copy otomatis. Silakan hubungi WhatsApp: 087823330830');
+                        addBotMessage('? Gagal copy otomatis. Silakan hubungi WhatsApp: 087823330830');
                     });
                 }
             }
@@ -1476,23 +1587,23 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 setTimeout(() => {
                     if (lastInput === 'reported_issue') {
                         addBotMessage('Wah, saya paham situasinya. Sekarang laptop Anda kondisinya bagaimana?', true, [
-                            {text: '💚 Masih Bisa Menyala Normal', action: 'laptop_on'},
-                            {text: '🟡 Menyala Tapi Ada Masalah', action: 'laptop_partially'},
-                            {text: '🔴 Tidak Bisa Menyala Sama Sekali', action: 'laptop_off'}
+                            {text: '?? Masih Bisa Menyala Normal', action: 'laptop_on'},
+                            {text: '?? Menyala Tapi Ada Masalah', action: 'laptop_partially'},
+                            {text: '?? Tidak Bisa Menyala Sama Sekali', action: 'laptop_off'}
                         ]);
                     } else if (lastInput === 'brand') {
-                        addBotMessage('Good! Tipe atau seri berapa laptop Anda? Ini penting untuk persiapan spare part dan tools khusus 🔧');
+                        addBotMessage('Good! Tipe atau seri berapa laptop Anda? Ini penting untuk persiapan spare part dan tools khusus ??');
                         showInputForm('model');
                     } 
                     else if (lastInput === 'model') {
-                        addBotMessage('Sebelum kita lanjut, mungkin Anda tertarik dengan promo spesial kami? 🎉', true, [
+                        addBotMessage('Sebelum kita lanjut, mungkin Anda tertarik dengan promo spesial kami? ??', true, [
                             {text: 'Maintenance Rutin (Hemat 20%)', action: 'show_promo_maintenance'},
                             {text: 'Voucher Perusahaan', action: 'show_promo_corporate'},
                             {text: 'Tidak, Lanjut Aja', action: 'continue_to_name'}
                         ]);
 
                     } else if (lastInput === 'name') {
-                        addBotMessage(`Hai ${userInputs.name}! Senang bisa bantu Anda hari ini 😊\n\nNomor WhatsApp berapa yang aktif untuk koordinasi nanti?`);
+                        addBotMessage(`Hai ${userInputs.name}! Senang bisa bantu Anda hari ini ??\n\nNomor WhatsApp berapa yang aktif untuk koordinasi nanti?`);
                         showInputForm('phone');
                     } else if (lastInput === 'phone') {
                         addBotMessage('Mantap! Workshop kami buka setiap hari jam 08.00-20.00. Alamat ada di Google Maps dengan nama "LaptopService". \n\nSebentar ya, saya buatkan ringkasan ordernya...');
@@ -1506,7 +1617,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                                 
                                 if (saveResult.success && saveResult.nota_number) {
                                     userInputs.notaNumber = saveResult.nota_number;
-                                    addBotMessage(`✅ Data Anda berhasil tersimpan!\n\n📋 **Nomor Nota: ${saveResult.nota_number}**\n\nSimpan nomor nota ini untuk melacak status pengerjaan laptop Anda.`);
+                                    addBotMessage(`? Data Anda berhasil tersimpan!\n\n?? **Nomor Nota: ${saveResult.nota_number}**\n\nSimpan nomor nota ini untuk melacak status pengerjaan laptop Anda.`);
                                     
                                     // Continue with final message generation
                                     setTimeout(async () => {
@@ -1815,7 +1926,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 resetChat();
                 // Re-initialize with fresh state
                 setTimeout(() => {
-                    addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
+                    addBotMessage('Halo! Saya LASO, asisten virtual LaptopService ??');
                     setTimeout(() => {
                         addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
                             {text: 'Service Laptop', action: 'service_laptop'},

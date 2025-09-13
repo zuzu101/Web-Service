@@ -31,22 +31,22 @@ class CustomersService
                 
                 // Get region names for address
                 if (!empty($data['village_id'])) {
-                    $village = \App\Models\Village::find($data['village_id']);
+                    $village = \App\Models\Region\Village::find($data['village_id']);
                     if ($village) $addressParts[] = $village->name;
                 }
                 
                 if (!empty($data['district_id'])) {
-                    $district = \App\Models\District::find($data['district_id']);
+                    $district = \App\Models\Region\District::find($data['district_id']);
                     if ($district) $addressParts[] = $district->name;
                 }
                 
                 if (!empty($data['regency_id'])) {
-                    $regency = \App\Models\Regency::find($data['regency_id']);
+                    $regency = \App\Models\Region\Regency::find($data['regency_id']);
                     if ($regency) $addressParts[] = $regency->name;
                 }
                 
                 if (!empty($data['province_id'])) {
-                    $province = \App\Models\Province::find($data['province_id']);
+                    $province = \App\Models\Region\Province::find($data['province_id']);
                     if ($province) $addressParts[] = $province->name;
                 }
                 

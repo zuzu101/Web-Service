@@ -45,6 +45,42 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="nav-item has-treeview {{ request()->routeIs('admin.cms.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>
+                            CMS
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.hero.index') }}" class="nav-link {{ request()->routeIs('admin.cms.hero.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Hero Section</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.advantage.index') }}" class="nav-link {{ request()->routeIs('admin.cms.advantage.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Keunggulan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.service.index') }}" class="nav-link {{ request()->routeIs('admin.cms.service.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Layanan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.step.index') }}" class="nav-link {{ request()->routeIs('admin.cms.step*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Step</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </nav>
     </div>

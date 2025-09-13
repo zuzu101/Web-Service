@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MasterData\CustomersRequest;
 use App\Models\MasterData\Customers;
 use App\Services\MasterData\CustomersService;
-use App\Models\Province;
-use App\Models\Regency;
-use App\Models\District;
-use App\Models\Village;
+use App\Models\Region\Province;
+use App\Models\Region\Regency;
+use App\Models\Region\District;
+use App\Models\Region\Village;
 use Illuminate\Http\Request;
 
 class CustomersController extends Controller

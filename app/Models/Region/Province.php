@@ -7,7 +7,7 @@
  *
  */
 
-namespace App\Models;
+namespace App\Models\Region;
 
 use AzisHapidin\IndoRegion\Traits\ProvinceTrait;
 use Illuminate\Database\Eloquent\Model;

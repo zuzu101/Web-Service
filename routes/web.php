@@ -7,6 +7,13 @@ use App\Http\Controllers\Back\MasterData\DeviceRepairController;
 use App\Http\Controllers\Back\MasterData\CustomersController;
 use App\Http\Controllers\Back\MasterData\NotaController;
 use App\Http\Controllers\Back\MasterData\ReportController;
+use App\Http\Controllers\Back\Cms\HeroSectionController;
+use App\Http\Controllers\Back\Cms\AdvantageController;
+use App\Http\Controllers\Back\Cms\AdvantageSectionController;
+use App\Http\Controllers\Back\Cms\ServiceController;
+use App\Http\Controllers\Back\Cms\ServiceSectionController;
+use App\Http\Controllers\Back\Cms\StepController;
+use App\Http\Controllers\Back\Cms\StepSectionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +55,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
 
     Route::group(['middleware' => ['auth:web']], function () {
 
+        // Dashboard route
+        Route::get('dashboard', function () {
+            return view('back.dashboard');
+        })->name('dashboard');
+
         Route::group(['prefix' => 'MasterData', 'as' => 'MasterData.'], function () {
 
             Route::resource('customers', CustomersController::class)->except('show')->parameters(['customers' => 'customer']);
@@ -86,6 +98,56 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
                 Route::get('export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
             });
 
+        });
+
+        // CMS Routes
+        Route::group(['prefix' => 'cms', 'as' => 'cms.'], function () {
+            Route::resource('hero', HeroSectionController::class)->parameters(['hero' => 'hero']);
+            Route::group(['prefix' => 'hero', 'as' => 'hero.'], function () {
+                Route::post('data', [HeroSectionController::class, 'data'])->name('data');
+                Route::post('{hero}/toggle-status', [HeroSectionController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+
+            Route::group(['prefix' => 'advantage', 'as' => 'advantage.'], function () {
+                Route::get('reorder-page', [AdvantageController::class, 'reorderPage'])->name('reorderPage');
+                Route::post('reorder', [AdvantageController::class, 'reorder'])->name('reorder');
+                Route::post('{advantage}/toggle-status', [AdvantageController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('advantage', AdvantageController::class)->parameters(['advantage' => 'advantage']);
+            
+            Route::group(['prefix' => 'advantage-section', 'as' => 'advantage-section.'], function () {
+                Route::get('get-title', [AdvantageSectionController::class, 'getTitle'])->name('getTitle');
+                Route::post('update-title', [AdvantageSectionController::class, 'updateTitle'])->name('updateTitle');
+            });
+            Route::resource('advantage-section', AdvantageSectionController::class)->parameters(['advantage_section' => 'advantageSection']);
+            
+            // Service Routes
+            Route::group(['prefix' => 'service', 'as' => 'service.'], function () {
+                Route::get('reorder-page', [ServiceController::class, 'reorderPage'])->name('reorderPage');
+                Route::post('reorder', [ServiceController::class, 'reorder'])->name('reorder');
+                Route::post('{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('service', ServiceController::class)->parameters(['service' => 'service']);
+            
+            Route::group(['prefix' => 'service-section', 'as' => 'service-section.'], function () {
+                Route::get('get-title', [ServiceSectionController::class, 'getTitle'])->name('getTitle');
+                Route::post('update-title', [ServiceSectionController::class, 'updateTitle'])->name('updateTitle');
+            });
+            Route::resource('service-section', ServiceSectionController::class)->parameters(['service_section' => 'serviceSection']);
+            
+            // Step Routes
+            Route::group(['prefix' => 'step', 'as' => 'step.'], function () {
+                Route::get('reorder-page', [StepController::class, 'reorderPage'])->name('reorderPage');
+                Route::post('reorder', [StepController::class, 'reorder'])->name('reorder');
+                Route::post('{step}/toggle-status', [StepController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('step', StepController::class)->parameters(['step' => 'step'])->except(['show']);
+            
+            Route::group(['prefix' => 'step-section', 'as' => 'step-section.'], function () {
+                Route::get('data', [StepSectionController::class, 'getSectionData'])->name('data');
+                Route::post('{stepSection}/toggle-status', [StepSectionController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('step-section', StepSectionController::class)->parameters(['step_section' => 'stepSection'])->except(['show']);
         });
 
     });

@@ -185,9 +185,9 @@
             });
 
         // Embed all data as JavaScript variables
-        const regenciesData = @json(\App\Models\Regency::with('province')->get()->groupBy('province_id'));
-        const districtsData = @json(\App\Models\District::with('regency')->get()->groupBy('regency_id'));
-        const villagesData = @json(\App\Models\Village::with('district')->get()->groupBy('district_id'));
+        const regenciesData = @json(\App\Models\Region\Regency::with('province')->get()->groupBy('province_id'));
+        const districtsData = @json(\App\Models\Region\District::with('regency')->get()->groupBy('regency_id'));
+        const villagesData = @json(\App\Models\Region\Village::with('district')->get()->groupBy('district_id'));
 
         // Province change handler
         $('#province_id').on('change', function() {

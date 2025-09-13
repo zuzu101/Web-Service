@@ -4,10 +4,10 @@ namespace App\Models\MasterData;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Province;
-use App\Models\Regency;
-use App\Models\District;
-use App\Models\Village;
+use App\Models\Region\Province;
+use App\Models\Region\Regency;
+use App\Models\Region\District;
+use App\Models\Region\Village;
 
 class Customers extends Model
 {

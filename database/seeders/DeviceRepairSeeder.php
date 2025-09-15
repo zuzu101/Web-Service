@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\MasterData\DeviceRepair;
 use App\Models\MasterData\Customers;
 use Faker\Factory as Faker;
@@ -16,127 +17,178 @@ class DeviceRepairSeeder extends Seeder
      */
     public function run(): void
     {
-        // If device_repairs already has data, skip to avoid duplicates
-        if (DeviceRepair::count() > 0) {
-            $this->command->info('Device repairs already seeded. Skipping.');
-            return;
-        }
-
-        $faker = Faker::create('id_ID'); // Indonesian locale
-        
-        // Data laptop dan brand populer di Indonesia
-        $laptopBrands = [
-            'ASUS', 'Acer', 'HP', 'Lenovo', 'Dell', 'MSI', 'Toshiba', 
-            'Sony', 'Samsung', 'Apple', 'Xiaomi', 'Huawei'
-        ];
-        
-        $laptopModels = [
-            'VivoBook', 'ZenBook', 'ROG Strix', 'TUF Gaming', 'Aspire', 'Swift',
-            'Nitro', 'Predator', 'Pavilion', 'EliteBook', 'Envy', 'Omen',
-            'ThinkPad', 'IdeaPad', 'Legion', 'Yoga', 'Inspiron', 'XPS',
-            'Latitude', 'Vostro', 'Katana', 'Stealth', 'Creator', 'Prestige',
-            'Satellite', 'Tecra', 'VAIO', 'Galaxy Book', 'MacBook', 'RedmiBook'
-        ];
-        
-        // Masalah umum laptop dalam bahasa Indonesia
-        $commonIssues = [
-            'Laptop mati total tidak bisa menyala',
-            'Layar blank hitam tapi power nyala', 
-            'Keyboard tidak berfungsi sebagian tombol',
-            'Touchpad tidak responsif',
-            'Baterai cepat habis tidak bisa charge',
-            'Kipas berisik dan panas berlebihan',
-            'WiFi tidak bisa connect',
-            'Bluetooth tidak terdeteksi',
-            'Audio tidak keluar suara',
-            'Webcam tidak berfungsi',
-            'Port USB rusak tidak terdeteksi',
-            'Charger tidak mengisi baterai',
-            'Layar bergaris atau flickering',
-            'Hard disk error tidak bisa booting',
-            'RAM error blue screen',
-            'Motherboard korsleting',
-            'Engsel layar patah',
-            'Spill cairan pada keyboard',
-            'Virus dan malware berat',
-            'Windows corrupt tidak bisa masuk',
-            'Overheat sering hang dan restart',
-            'Speaker crackling suara pecah',
-            'CD/DVD ROM tidak terbaca',
-            'Lag dan lemot saat digunakan',
-            'Install ulang Windows dan software'
-        ];
-        
-        $statusOptions = [
-            'Perangkat Baru Masuk',
-            'Sedang Diperbaiki', 
-            'Selesai'
-        ];
-        
-        // Catatan teknisi dalam bahasa Indonesia
-        $technicianNotes = [
-            'Perlu ganti thermal paste dan pembersihan internal',
-            'RAM sudah diganti dengan yang baru',
-            'Hard disk diganti dengan SSD baru',
-            'Keyboard sudah dibersihkan dan diperbaiki',
-            'Motherboard perlu penggantian komponen',
-            'Baterai original sudah diganti',
-            'Install ulang Windows 11 dan driver lengkap',
-            'Perbaikan engsel layar sudah selesai',
-            'Pembersihan virus dan optimasi sistem',
-            'Ganti kipas processor yang rusak',
-            'Perbaikan jalur charging pada motherboard',
-            'Update BIOS dan driver terbaru',
-            'Penggantian layar LCD yang retak',
-            'Perbaikan port USB yang longgar',
-            'Cleaning dan re-apply thermal compound'
-        ];
-        
-        // Get all customer IDs
-        $customerIds = Customers::pluck('id')->toArray();
-        
-        if (empty($customerIds)) {
-            $this->command->warn('Tidak ada data customers. Jalankan CustomersSeeder terlebih dahulu.');
-            return;
-        }
-        
-        // Generate device repair data untuk 1 tahun kebelakang
-        $startDate = Carbon::now()->subYear();
-        $endDate = Carbon::now();
-        
-        for ($i = 1; $i <= 200; $i++) {
-            $randomDate = Carbon::createFromTimestamp(
-                rand($startDate->timestamp, $endDate->timestamp)
-            );
-            
-            $brand = $faker->randomElement($laptopBrands);
-            $model = $faker->randomElement($laptopModels);
-            $status = $faker->randomElement($statusOptions);
-            
-            // Generate price berdasarkan status
-            $price = null;
-            $completeDate = null;
-            
-            if ($status === 'Selesai') {
-                $price = $faker->numberBetween(50000, 2000000); // 50rb - 2jt
-                $completeDate = $randomDate->copy()->addDays($faker->numberBetween(1, 14));
-            }
-            
-            DeviceRepair::create([
-                'customer_id' => $faker->randomElement($customerIds),
-                'brand' => $brand,
-                'model' => $model . ' ' . $faker->numberBetween(100, 9999),
-                'reported_issue' => $faker->randomElement($commonIssues),
-                'serial_number' => strtoupper($faker->lexify('??')) . $faker->numerify('######'),
-                'technician_note' => $faker->boolean(70) ? $faker->randomElement($technicianNotes) : null,
-                'status' => $status,
-                'price' => $price,
-                'complete_in' => $completeDate,
-                'created_at' => $randomDate,
-                'updated_at' => $randomDate->copy()->addHours($faker->numberBetween(1, 48))
-            ]);
-        }
-        
-        $this->command->info('Berhasil membuat 200 data device repair dengan data Indonesia');
+        DB::table('device_repairs')->delete();
+        DB::table('device_repairs')->insert([
+            [
+                'id' => 1,
+                'nota_number' => 'NOTA-202505-001',
+                'customer_id' => 1,
+                'brand' => 'HP',
+                'model' => 'Galaxy Book 8504',
+                'reported_issue' => 'Touchpad tidak responsif',
+                'serial_number' => 'GZ762006',
+                'technician_note' => 'Update BIOS dan driver terbaru',
+                'status' => 'Perangkat Baru Masuk',
+                'price' => null,
+                'payment_method' => null,
+                'transfer_proof' => null,
+                'complete_in' => null,
+                'created_at' => '2025-05-24 00:01:08',
+                'updated_at' => '2025-05-24 03:01:08',
+            ],
+            [
+                'id' => 2,
+                'nota_number' => 'NOTA-202509-002',
+                'customer_id' => 2,
+                'brand' => 'Sony',
+                'model' => 'Stealth 8913',
+                'reported_issue' => 'Audio tidak keluar suara',
+                'serial_number' => 'AJ233788',
+                'technician_note' => null,
+                'status' => 'Perangkat Baru Masuk',
+                'price' => null,
+                'payment_method' => null,
+                'transfer_proof' => null,
+                'complete_in' => null,
+                'created_at' => '2025-08-31 23:57:39',
+                'updated_at' => '2025-09-01 23:57:39',
+            ],
+            [
+                'id' => 3,
+                'nota_number' => 'NOTA-202509-003',
+                'customer_id' => 3,
+                'brand' => 'Lenovo',
+                'model' => 'ThinkPad X1',
+                'reported_issue' => 'Baterai cepat habis',
+                'serial_number' => 'TPX10001',
+                'technician_note' => 'Ganti baterai',
+                'status' => 'Selesai',
+                'price' => 500000,
+                'payment_method' => 'Cash',
+                'transfer_proof' => null,
+                'complete_in' => '2025-09-10',
+                'created_at' => '2025-09-05 10:00:00',
+                'updated_at' => '2025-09-10 15:00:00',
+            ],
+            [
+                'id' => 4,
+                'nota_number' => 'NOTA-202509-004',
+                'customer_id' => 4,
+                'brand' => 'Asus',
+                'model' => 'ROG Zephyrus',
+                'reported_issue' => 'Layar bergaris',
+                'serial_number' => 'ASUSROG123',
+                'technician_note' => 'Ganti panel LCD',
+                'status' => 'Proses',
+                'price' => 1200000,
+                'payment_method' => 'Transfer',
+                'transfer_proof' => 'bukti_transfer_4.jpg',
+                'complete_in' => null,
+                'created_at' => '2025-09-07 09:00:00',
+                'updated_at' => '2025-09-07 09:00:00',
+            ],
+            [
+                'id' => 5,
+                'nota_number' => 'NOTA-202509-005',
+                'customer_id' => 5,
+                'brand' => 'Acer',
+                'model' => 'Swift 3',
+                'reported_issue' => 'Keyboard error',
+                'serial_number' => 'ACERSWIFT3',
+                'technician_note' => 'Ganti keyboard',
+                'status' => 'Selesai',
+                'price' => 350000,
+                'payment_method' => 'Cash',
+                'transfer_proof' => null,
+                'complete_in' => '2025-09-12',
+                'created_at' => '2025-09-08 11:00:00',
+                'updated_at' => '2025-09-12 16:00:00',
+            ],
+            [
+                'id' => 6,
+                'nota_number' => 'NOTA-202509-006',
+                'customer_id' => 6,
+                'brand' => 'Apple',
+                'model' => 'MacBook Air',
+                'reported_issue' => 'Tidak bisa charging',
+                'serial_number' => 'MBA2025',
+                'technician_note' => 'Ganti IC charging',
+                'status' => 'Proses',
+                'price' => 800000,
+                'payment_method' => 'Transfer',
+                'transfer_proof' => 'bukti_transfer_6.jpg',
+                'complete_in' => null,
+                'created_at' => '2025-09-09 13:00:00',
+                'updated_at' => '2025-09-09 13:00:00',
+            ],
+            [
+                'id' => 7,
+                'nota_number' => 'NOTA-202509-007',
+                'customer_id' => 7,
+                'brand' => 'Dell',
+                'model' => 'Inspiron 15',
+                'reported_issue' => 'Overheating',
+                'serial_number' => 'DELLINSP15',
+                'technician_note' => 'Bersihkan fan dan ganti thermal paste',
+                'status' => 'Selesai',
+                'price' => 250000,
+                'payment_method' => 'Cash',
+                'transfer_proof' => null,
+                'complete_in' => '2025-09-13',
+                'created_at' => '2025-09-10 14:00:00',
+                'updated_at' => '2025-09-13 17:00:00',
+            ],
+            [
+                'id' => 8,
+                'nota_number' => 'NOTA-202509-008',
+                'customer_id' => 8,
+                'brand' => 'HP',
+                'model' => 'Pavilion 14',
+                'reported_issue' => 'WiFi tidak terdeteksi',
+                'serial_number' => 'HPPAV14',
+                'technician_note' => 'Ganti modul WiFi',
+                'status' => 'Proses',
+                'price' => 400000,
+                'payment_method' => 'Transfer',
+                'transfer_proof' => 'bukti_transfer_8.jpg',
+                'complete_in' => null,
+                'created_at' => '2025-09-11 15:00:00',
+                'updated_at' => '2025-09-11 15:00:00',
+            ],
+            [
+                'id' => 9,
+                'nota_number' => 'NOTA-202509-009',
+                'customer_id' => 9,
+                'brand' => 'Samsung',
+                'model' => 'Galaxy Book S',
+                'reported_issue' => 'Speaker pecah',
+                'serial_number' => 'GBS2025',
+                'technician_note' => 'Ganti speaker',
+                'status' => 'Selesai',
+                'price' => 300000,
+                'payment_method' => 'Cash',
+                'transfer_proof' => null,
+                'complete_in' => '2025-09-14',
+                'created_at' => '2025-09-12 16:00:00',
+                'updated_at' => '2025-09-14 18:00:00',
+            ],
+            [
+                'id' => 10,
+                'nota_number' => 'NOTA-202509-010',
+                'customer_id' => 10,
+                'brand' => 'Toshiba',
+                'model' => 'Satellite L850',
+                'reported_issue' => 'Tidak bisa booting',
+                'serial_number' => 'TOSHL850',
+                'technician_note' => 'Ganti harddisk',
+                'status' => 'Proses',
+                'price' => 600000,
+                'payment_method' => 'Transfer',
+                'transfer_proof' => 'bukti_transfer_10.jpg',
+                'complete_in' => null,
+                'created_at' => '2025-09-13 17:00:00',
+                'updated_at' => '2025-09-13 17:00:00',
+            ],
+        ]);
     }
 }

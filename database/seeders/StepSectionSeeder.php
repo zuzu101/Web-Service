@@ -19,7 +19,7 @@ class StepSectionSeeder extends Seeder
         StepSection::create([
             'title' => '3 Langkah Mudah Layanan Kami',
             'subtitle' => 'Ikuti alur sederhana kami untuk mendapatkan layanan perbaikan yang cepat dan efisien.',
-            'background_image' => null,
+            'background_image' => 'BGalur.png',
             'is_active' => true,
             'order' => 0,
         ]);

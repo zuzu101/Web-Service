@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('device_repairs', function (Blueprint $table) {
             $table->id();
+            $table->string('nota_number')->unique()->nullable();
             $table->string('brand');
             $table->string('model');
             $table->text('reported_issue');
             $table->string('serial_number');
             $table->text('technician_note')->nullable();
+            $table->string('status')->default('Perangkat Baru Masuk');
+            $table->decimal('price', 12, 2)->nullable()->comment('Estimasi biaya service');
+            $table->date('complete_in')->nullable()->comment('Perkiraan tanggal selesai service');
             $table->timestamps();
         });
     }

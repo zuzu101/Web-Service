@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use App\Models\MasterData\Customers;
 use Faker\Factory as Faker;
@@ -14,23 +14,169 @@ class CustomersSeeder extends Seeder
      */
     public function run(): void
     {
-        // If customers table already has data, skip seeding
-        if (Customers::count() > 0) {
-            $this->command->info('Customers table already seeded. Skipping.');
-            return;
-        }
-
-        $faker = Faker::create('id_ID'); // Indonesian locale
-        
-        // Generate 50 random customers
-        for ($i = 1; $i <= 50; $i++) {
-            Customers::create([
-                'name' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'phone' => $faker->phoneNumber,
-                'address' => $faker->address,
-                'status' => $faker->boolean(80), // 80% chance to be active
-            ]);
-        }
+        \DB::table('device_repairs')->delete();
+        \DB::table('customers')->delete();
+        \DB::table('customers')->insert([
+            [
+                'id' => 1,
+                'name' => 'Ida Nurdiyanti S.I.Kom',
+                'phone' => '(+62) 913 1620 0687',
+                'email' => 'unggul24@example.com',
+                'address' => 'Gg. Dahlia No. 614, Solok 62377, Riau',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Laswi Kusumo',
+                'phone' => '(+62) 686 1223 5969',
+                'email' => 'waluyo.mala@example.net',
+                'address' => 'Ds. Jakarta No. 657, Bontang 65256, Kalteng',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Marwata Zulkarnain',
+                'phone' => '(+62) 347 8140 7030',
+                'email' => 'michelle.hartati@example.net',
+                'address' => 'Gg. Uluwatu No. 176, Pontianak 93586, Papua',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 4,
+                'name' => 'Rizky Pratama',
+                'phone' => '(+62) 812 3456 7890',
+                'email' => 'rizky.pratama@example.com',
+                'address' => 'Jl. Melati No. 10, Bandung',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 5,
+                'name' => 'Siti Aminah',
+                'phone' => '(+62) 813 9876 5432',
+                'email' => 'siti.aminah@example.com',
+                'address' => 'Jl. Kenanga No. 5, Surabaya',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 6,
+                'name' => 'Budi Santoso',
+                'phone' => '(+62) 814 5678 1234',
+                'email' => 'budi.santoso@example.com',
+                'address' => 'Jl. Mawar No. 8, Semarang',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 7,
+                'name' => 'Dewi Lestari',
+                'phone' => '(+62) 815 6789 2345',
+                'email' => 'dewi.lestari@example.com',
+                'address' => 'Jl. Anggrek No. 12, Yogyakarta',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 8,
+                'name' => 'Agus Salim',
+                'phone' => '(+62) 816 7890 3456',
+                'email' => 'agus.salim@example.com',
+                'address' => 'Jl. Flamboyan No. 3, Medan',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 9,
+                'name' => 'Sri Wahyuni',
+                'phone' => '(+62) 817 8901 4567',
+                'email' => 'sri.wahyuni@example.com',
+                'address' => 'Jl. Cempaka No. 7, Malang',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+            [
+                'id' => 10,
+                'name' => 'Tono Supriyadi',
+                'phone' => '(+62) 818 9012 5678',
+                'email' => 'tono.supriyadi@example.com',
+                'address' => 'Jl. Teratai No. 2, Palembang',
+                'province_id' => null,
+                'regency_id' => null,
+                'district_id' => null,
+                'village_id' => null,
+                'street_address' => null,
+                'status' => 1,
+                'email_verified_at' => null,
+                'created_at' => '2025-09-06 01:55:15',
+                'updated_at' => '2025-09-06 01:55:15',
+            ],
+        ]);
     }
 }

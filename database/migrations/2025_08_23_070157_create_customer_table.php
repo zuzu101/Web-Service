@@ -15,11 +15,21 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone')->nullable();
-            $table->string('email')->unique();
+            $table->string('email'); // unique constraint dihapus
             $table->text('address')->nullable();
+            $table->string('province_id')->nullable();
+            $table->string('regency_id')->nullable();
+            $table->string('district_id')->nullable();
+            $table->string('village_id')->nullable();
+            $table->text('street_address')->nullable()->comment('Detail alamat seperti RT/RW, nama jalan, dll');
             $table->tinyInteger('status')->default(1);
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('province_id')->references('id')->on('provinces')->onDelete('set null');
+            $table->foreign('regency_id')->references('id')->on('regencies')->onDelete('set null');
+            $table->foreign('district_id')->references('id')->on('districts')->onDelete('set null');
+            $table->foreign('village_id')->references('id')->on('villages')->onDelete('set null');
         });
     }
 

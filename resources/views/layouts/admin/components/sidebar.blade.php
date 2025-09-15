@@ -32,15 +32,15 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('admin.MasterData.Report.brand') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.brand') ? 'active' : '' }}">
-                                
-                                <p>Laporan per Brand</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a href="{{ route('admin.MasterData.Report.dashboard') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.dashboard') ? 'active' : '' }}">
                                 
                                 <p>Dashboard Laporan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.MasterData.Report.brand') }}" class="nav-link {{ request()->routeIs('admin.MasterData.Report.brand') ? 'active' : '' }}">
+                                
+                                <p>Laporan per Brand</p>
                             </a>
                         </li>
                     </ul>
@@ -77,6 +77,42 @@
                             <a href="{{ route('admin.cms.step.index') }}" class="nav-link {{ request()->routeIs('admin.cms.step*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Step</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.video.index') }}" class="nav-link {{ request()->routeIs('admin.cms.video*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Video</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.promo.index') }}" class="nav-link {{ request()->routeIs('admin.cms.promo*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Promo</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.testimonial.index') }}" class="nav-link {{ request()->routeIs('admin.cms.testimonial*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Testimoni</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.about-section.index') }}" class="nav-link {{ request()->routeIs('admin.cms.about-section*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tentang Kami</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.cta-section.index') }}" class="nav-link {{ request()->routeIs('admin.cms.cta-section*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>CTA Section</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cms.contact-info.index') }}" class="nav-link {{ request()->routeIs('admin.cms.contact-info*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Contact Info</p>
                             </a>
                         </li>
                     </ul>

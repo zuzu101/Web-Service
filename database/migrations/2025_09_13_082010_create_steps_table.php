@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('icon');
             $table->string('title');
             $table->text('description');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(true); // status enum dihapus, pakai is_active
             $table->integer('order')->default(0);
             $table->timestamp('activated_at')->nullable();
             $table->timestamps();

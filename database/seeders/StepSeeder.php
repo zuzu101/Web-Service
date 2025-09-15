@@ -14,46 +14,55 @@ class StepSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create step section
-        $stepSection = StepSection::create([
-            'title' => '3 Langkah Mudah Layanan Kami',
-            'subtitle' => 'Proses mudah dan cepat untuk mendapatkan layanan terbaik dari kami dengan sistem yang telah terintegrasi',
-            'is_active' => true,
-            'order' => 1,
+        // Data persis seperti SQL
+        StepSection::truncate();
+        Step::truncate();
+        StepSection::insert([
+            [
+                'id' => 1,
+                'title' => '3 Langkah Mudah Layanan Kami',
+                'subtitle' => 'Ikuti alur sederhana kami untuk mendapatkan layanan perbaikan yang cepat dan efisien.',
+                'background_image' => null,
+                'is_active' => 1,
+                'order' => 0,
+                'created_at' => '2025-09-13 02:19:08',
+                'updated_at' => '2025-09-13 02:19:08',
+            ],
         ]);
-
-        // Create 3 steps
-        $steps = [
+        Step::insert([
             [
-                'icon' => 'consultation.png', // placeholder icon name
-                'title' => 'Konsultasi Gratis',
-                'description' => 'Konsultasi gratis dengan teknisi ahli kami untuk mengetahui masalah perangkat elektronik Anda. Kami akan memberikan analisa mendalam dan solusi terbaik.',
-                'is_active' => true,
-                'order' => 1,
-                'activated_at' => now(),
-            ],
-            [
-                'icon' => 'repair.png', // placeholder icon name
-                'title' => 'Proses Perbaikan',
-                'description' => 'Tim teknisi berpengalaman kami akan melakukan perbaikan dengan menggunakan spare part original dan teknologi terkini untuk hasil yang maksimal.',
-                'is_active' => true,
+                'id' => 2,
+                'icon' => '1757755477_pengerjaan.png',
+                'title' => 'Pengerjaan Teknisi',
+                'description' => 'Teknisi ahli kami akan segera menganalisa dan memperbaiki masalahnya.',
+                'is_active' => 1,
                 'order' => 2,
-                'activated_at' => now(),
+                'activated_at' => '2025-09-13 01:26:42',
+                'created_at' => '2025-09-13 01:26:42',
+                'updated_at' => '2025-09-13 02:24:37',
             ],
             [
-                'icon' => 'delivery.png', // placeholder icon name
-                'title' => 'Selesai & Garansi',
-                'description' => 'Perangkat Anda akan dikembalikan dalam kondisi prima dengan garansi resmi. Kami juga menyediakan layanan antar jemput untuk kemudahan Anda.',
-                'is_active' => true,
-                'order' => 3,
-                'activated_at' => now(),
+                'id' => 5,
+                'icon' => '1757755398_konsultasi.png',
+                'title' => 'Konsultasi Kerusakan',
+                'description' => 'Hubungi kami dan sampaikan masalah yang terjadi pada perangkat Anda',
+                'is_active' => 1,
+                'order' => 1,
+                'activated_at' => '2025-09-13 02:01:08',
+                'created_at' => '2025-09-13 02:01:08',
+                'updated_at' => '2025-09-13 02:59:04',
             ],
-        ];
-
-        foreach ($steps as $step) {
-            Step::create($step);
-        }
-
-        $this->command->info('Step section and steps seeded successfully!');
+            [
+                'id' => 6,
+                'icon' => '1757755553_selesai.png',
+                'title' => 'Unit Siap Diambil',
+                'description' => 'Kami akan menghubungi Anda jika perangkat sudah selesai diperbaiki.',
+                'is_active' => 1,
+                'order' => 3,
+                'activated_at' => '2025-09-13 02:01:16',
+                'created_at' => '2025-09-13 02:01:16',
+                'updated_at' => '2025-09-13 02:25:53',
+            ],
+        ]);
     }
 }

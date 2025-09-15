@@ -14,6 +14,14 @@ use App\Http\Controllers\Back\Cms\ServiceController;
 use App\Http\Controllers\Back\Cms\ServiceSectionController;
 use App\Http\Controllers\Back\Cms\StepController;
 use App\Http\Controllers\Back\Cms\StepSectionController;
+use App\Http\Controllers\Back\Cms\VideoController;
+use App\Http\Controllers\Back\Cms\VideoSectionController;
+use App\Http\Controllers\Back\Cms\PromoController;
+use App\Http\Controllers\Back\Cms\TestimonialController;
+use App\Http\Controllers\Back\Cms\TestimonialSectionController;
+use App\Http\Controllers\Back\Cms\AboutSectionController;
+use App\Http\Controllers\Back\Cms\CtaSectionController;
+use App\Http\Controllers\Back\Cms\ContactInfoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -148,6 +156,58 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
                 Route::post('{stepSection}/toggle-status', [StepSectionController::class, 'toggleStatus'])->name('toggleStatus');
             });
             Route::resource('step-section', StepSectionController::class)->parameters(['step_section' => 'stepSection'])->except(['show']);
+            
+            // Video Routes
+            Route::group(['prefix' => 'video', 'as' => 'video.'], function () {
+                Route::post('{video}/toggle-status', [VideoController::class, 'toggleStatus'])->name('toggleStatus');
+                Route::get('section-title', [VideoController::class, 'getSectionTitle'])->name('getSectionTitle');
+                Route::post('section-title', [VideoController::class, 'updateSectionTitle'])->name('updateSectionTitle');
+            });
+            Route::resource('video', VideoController::class)->parameters(['video' => 'video'])->except(['show']);
+            
+            // Promo Routes
+            Route::group(['prefix' => 'promo', 'as' => 'promo.'], function () {
+                Route::post('{promo}/toggle-status', [PromoController::class, 'toggleStatus'])->name('toggleStatus');
+                Route::get('section-title', [PromoController::class, 'getSectionTitle'])->name('getSectionTitle');
+                Route::post('section-title', [PromoController::class, 'updateSectionTitle'])->name('updateSectionTitle');
+            });
+            Route::resource('promo', PromoController::class)->parameters(['promo' => 'promo'])->except(['show']);
+            
+            // Testimonial Routes
+            Route::group(['prefix' => 'testimonial', 'as' => 'testimonial.'], function () {
+                Route::get('reorder-page', [TestimonialController::class, 'reorderPage'])->name('reorderPage');
+                Route::post('reorder', [TestimonialController::class, 'updateOrder'])->name('updateOrder');
+                Route::post('{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('testimonial', TestimonialController::class)->parameters(['testimonial' => 'testimonial'])->except(['show']);
+            
+            Route::group(['prefix' => 'testimonial-section', 'as' => 'testimonial-section.'], function () {
+                Route::get('get-title', [TestimonialSectionController::class, 'getTitle'])->name('getTitle');
+                Route::post('update-title', [TestimonialSectionController::class, 'updateTitle'])->name('updateTitle');
+            });
+            Route::resource('testimonial-section', TestimonialSectionController::class)->parameters(['testimonial_section' => 'testimonialSection'])->except(['show']);
+
+            // About Section Routes
+            Route::group(['prefix' => 'about-section', 'as' => 'about-section.'], function () {
+                Route::post('{aboutSection}/toggle-status', [AboutSectionController::class, 'toggleStatus'])->name('toggleStatus');
+            });
+            Route::resource('about-section', AboutSectionController::class)->parameters(['about_section' => 'aboutSection']);
+
+            // CTA Section Routes
+            Route::group(['prefix' => 'cta-section', 'as' => 'cta-section.'], function () {
+                Route::post('{id}/toggle', [CtaSectionController::class, 'toggle'])->name('toggle');
+            });
+            Route::resource('cta-section', CtaSectionController::class)->parameters(['cta_section' => 'ctaSection']);
+
+            // Contact Info Routes
+            Route::group(['prefix' => 'contact-info', 'as' => 'contact-info.'], function () {
+                Route::post('{contactInfo}/toggle-status', [ContactInfoController::class, 'toggleStatus'])->name('toggleStatus');
+                Route::get('reorder', [ContactInfoController::class, 'reorderPage'])->name('reorder');
+                Route::post('update-order', [ContactInfoController::class, 'updateOrder'])->name('updateOrder');
+                Route::get('get-maps-url', [ContactInfoController::class, 'getMapsUrl'])->name('getMapsUrl');
+                Route::post('update-maps', [ContactInfoController::class, 'updateMaps'])->name('updateMaps');
+            });
+            Route::resource('contact-info', ContactInfoController::class)->parameters(['contact_info' => 'contactInfo']);
         });
 
     });

@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hero_sections', function (Blueprint $table) {
-            $table->dropColumn('image2');
+        Schema::create('contact_sections', function (Blueprint $table) {
+            $table->id();
+            $table->text('maps_embed_url'); // Google Maps embed URL
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hero_sections', function (Blueprint $table) {
-            $table->string('image2')->nullable()->after('image1');
-        });
+        Schema::dropIfExists('contact_sections');
     }
 };

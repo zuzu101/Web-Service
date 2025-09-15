@@ -307,151 +307,297 @@
 
     <section id="proses">
         <div class="container">
-            <div class="row gx-4 gy-4 justify-content-center">
-                <div class="col-lg-6 col-md-6 animate-on-scroll fade-in-left">
-                    <div class="card h-100 shadow">
-                        <div class="card-body">
-                            <h4 class="card-title header-4 color-navy fw-semibold mb-4 text-center">Lihat Proses Pengerjaan Teknisi Kami</h4>
-                            <div class="embed-responsive embed-responsive-16by9 justify-content-center d-flex mb-2">
-                                <iframe class="embed-responsive-item mb-3" src="https://www.youtube.com/embed/OBBMF_9oD5g?si=G8AqVrmW8rOFdgIJ" allowfullscreen></iframe>
+            @if($videos && $videos->count() > 0)
+                @if($videoSection && $videoSection->title && trim($videoSection->title) !== '')
+                    <h2 class="header-2 color-navy fw-bold mb-2 text-center animate-on-scroll fade-in-up">
+                        {{ $videoSection->title }}
+                    </h2>
+                @endif
+                
+                @if($videoSection && $videoSection->subtitle && trim($videoSection->subtitle) !== '')
+                    <p class="body-1 color-navy fw-normal mb-5 text-center animate-on-scroll fade-in-up delay-1">{{ $videoSection->subtitle }}</p>
+                @endif
+                
+                <div class="row gx-4 gy-4 justify-content-center">
+                    @foreach($videos->take(4) as $index => $video)
+                        @php
+                            $colClass = $videos->count() == 1 ? 'col-lg-8 col-md-10' : ($videos->count() == 2 ? 'col-lg-6 col-md-6' : 'col-lg-6 col-md-6');
+                            $animationClass = $index % 2 == 0 ? 'fade-in-left' : 'fade-in-right';
+                        @endphp
+                        <div class="{{ $colClass }} animate-on-scroll {{ $animationClass }}">
+                            <div class="card h-100 shadow">
+                                <div class="card-body">
+                                    <h4 class="card-title header-4 color-navy fw-semibold mb-4 text-center">{{ $video->title }}</h4>
+                                    <div class="embed-responsive embed-responsive-16by9 justify-content-center d-flex mb-2">
+                                        <iframe class="embed-responsive-item mb-3" 
+                                                src="{{ $video->embed_url }}" 
+                                                allowfullscreen
+                                                title="{{ $video->title }}"></iframe>
+                                    </div>
+                                    <p class="body-1-card color-navy text-center mb-0">{{ $video->description }}</p>
+                                </div>
                             </div>
-                            <p class="body-1-card color-navy text-center mb-0">Video menunjukkan proses service laptop secara profesional dan transparan</p>
+                        </div>
+                        @if($index == 1 && $videos->count() > 2)
+                            </div>
+                            <div class="row gx-4 gy-4 justify-content-center">
+                        @endif
+                    @endforeach
+                </div>
+            @else
+                {{-- Fallback content jika tidak ada video aktif --}}
+                <div class="row gx-4 gy-4 justify-content-center">
+                    <div class="col-lg-6 col-md-6 animate-on-scroll fade-in-left">
+                        <div class="card h-100 shadow">
+                            <div class="card-body">
+                                <h4 class="card-title header-4 color-navy fw-semibold mb-4 text-center">Lihat Proses Pengerjaan Teknisi Kami</h4>
+                                <div class="embed-responsive embed-responsive-16by9 justify-content-center d-flex mb-2">
+                                    <iframe class="embed-responsive-item mb-3" src="https://www.youtube.com/embed/OBBMF_9oD5g?si=G8AqVrmW8rOFdgIJ" allowfullscreen></iframe>
+                                </div>
+                                <p class="body-1-card color-navy text-center mb-0">Video menunjukkan proses service laptop secara profesional dan transparan</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-lg-6 col-md-6 animate-on-scroll fade-in-right">
-                    <div class="card h-100 shadow">
-                        <div class="card-body">
-                            <h4 class="card-title header-4 color-navy fw-semibold mb-4 text-center">Lihat Proses Pengerjaan Teknisi Kami</h4>
-                            <div class="embed-responsive embed-responsive-16by9 justify-content-center d-flex mb-2">
-                                <iframe class="embed-responsive-item mb-3" src="https://www.youtube.com/embed/3edtMfPl_kM?si=InXH8nmx5KUx2XbN" allowfullscreen></iframe>
+                    <div class="col-lg-6 col-md-6 animate-on-scroll fade-in-right">
+                        <div class="card h-100 shadow">
+                            <div class="card-body">
+                                <h4 class="card-title header-4 color-navy fw-semibold mb-4 text-center">Lihat Proses Pengerjaan Teknisi Kami</h4>
+                                <div class="embed-responsive embed-responsive-16by9 justify-content-center d-flex mb-2">
+                                    <iframe class="embed-responsive-item mb-3" src="https://www.youtube.com/embed/3edtMfPl_kM?si=InXH8nmx5KUx2XbN" allowfullscreen></iframe>
+                                </div>
+                                <p class="body-1-card color-navy text-center mb-0">Video menunjukkan proses service laptop secara profesional dan transparan</p>
                             </div>
-                            <p class="body-1-card color-navy text-center mb-0">Video menunjukkan proses service laptop secara profesional dan transparan</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 
     <section id="promo">
         <div class="container">
-            <h2 class="header-2 color-navy fw-bold mb-2 text-center">Promo Spesial Bulan Ini</h2>
-            <p class="body-1 color-navy fw-normal mb-5 text-center">Penawaran Terbatas Untuk Anda!</p>
+            @if($promoSection && $promoSection->title && trim($promoSection->title) !== '')
+                <h2 class="header-2 color-navy fw-bold mb-2 text-center">
+                    {{ $promoSection->title }}
+                </h2>
+            @endif
+            @if($promoSection && $promoSection->subtitle && trim($promoSection->subtitle) !== '')
+                <p class="body-1 color-navy fw-normal mb-5 text-center">
+                    {{ $promoSection->subtitle }}
+                </p>
+            @endif
             <div class="row gx-4 gy-4 justify-content-center">
-                <div class="col-lg-5 col-md-6">
-                    <div class="card shadow">
-                        <img class="card-img-top" src="{{ asset('images\diskon1.png') }}" alt="Card image cap">
-                        <div class="card-body">
-                            <h4 class="header-2 color-navy fw-bold text-center mb-3">Hemat hingga 20% untuk Maintenance Rutin</h4>
-                            <p class="body-1-card color-navy text-center mb-3">Rawat laptop Anda secara berkala dan dapatkan diskon menarik untuk setiap kunjungan ke-2 dan seterusnya.</p>
-                            <ul class="body-1-card color-navy mb-5">
-                                <li>Pembersihan menyeluruh sistem</li>
-                                <li>Update software terbaru</li>
-                                <li>Optimasi performa</li>
-                                <li>Garansi layanan 30 hari</li>
-                            </ul>
-                            <div class="d-grid">
-                                <a href="https://wa.me/6287823330830?text={{ urlencode('*PROMO MAINTENANCE RUTIN*
+                @if($promos && $promos->count() > 0)
+                    @foreach($promos as $promo)
+                        <div class="col-lg-5 col-md-6">
+                            <div class="card shadow">
+                                <div class="position-relative">
+                                    @if($promo->image_url)
+                                        <img class="card-img-top" 
+                                             src="{{ $promo->image_url }}" 
+                                             alt="{{ $promo->title }}">
+                                    @else
+                                        <img class="card-img-top" 
+                                             src="{{ asset('images/diskon1.png') }}" 
+                                             alt="{{ $promo->title }}">
+                                    @endif
+                                    @if($promo->discount_text)
+                                        <div class="position-absolute top-0 end-0 m-3">
+                                            <span class="badge" 
+                                                  style="background: #dc3545; color: white; font-size: 14px; font-weight: bold; padding: 8px 12px;">
+                                                {{ $promo->discount_text }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="header-2 color-navy fw-bold text-center mb-3">
+                                        {{ $promo->title }}
+                                    </h4>
+                                    <p class="body-1-card color-navy text-center mb-3">
+                                        {{ $promo->description }}
+                                    </p>
+                                    @if($promo->features && count($promo->features) > 0)
+                                        <ul class="body-1-card color-navy mb-5">
+                                            @foreach($promo->features as $feature)
+                                                <li>{{ $feature }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                    <div class="d-grid">
+                                        <a href="{{ $promo->whatsapp_url }}" 
+                                           target="_blank" 
+                                           class="btn btn-primary mb-0">
+                                            {{ $promo->button_text }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    {{-- Fallback content jika tidak ada promo aktif --}}
+                    <div class="col-lg-5 col-md-6">
+                        <div class="card shadow">
+                            <img class="card-img-top" src="{{ asset('images\diskon1.png') }}" alt="Card image cap">
+                            <div class="card-body">
+                                <h4 class="header-2 color-navy fw-bold text-center mb-3">Hemat hingga 20% untuk Maintenance Rutin</h4>
+                                <p class="body-1-card color-navy text-center mb-3">Rawat laptop Anda secara berkala dan dapatkan diskon menarik untuk setiap kunjungan ke-2 dan seterusnya.</p>
+                                <ul class="body-1-card color-navy mb-5">
+                                    <li>Pembersihan menyeluruh sistem</li>
+                                    <li>Update software terbaru</li>
+                                    <li>Optimasi performa</li>
+                                    <li>Garansi layanan 30 hari</li>
+                                </ul>
+                                <div class="d-grid">
+                                    <a href="https://wa.me/6287823330830?text={{ urlencode('*PROMO MAINTENANCE RUTIN*
 
 Halo, saya tertarik dengan promo maintenance rutin yang menawarkan hemat hingga 20%.
 
 Saya ingin mengetahui lebih lanjut tentang:
-� Pembersihan menyeluruh sistem
-� Update software terbaru
-� Optimasi performa
-� Garansi layanan 30 hari
+- Pembersihan menyeluruh sistem
+- Update software terbaru
+- Optimasi performa
+- Garansi layanan 30 hari
 
 Mohon informasi jadwal dan estimasi biaya. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Jadwalkan Sekarang</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-5 col-md-6">
-                    <div class="card shadow">
-                        <img class="card-img-top" src="{{ asset('images\diskon2.png') }}" alt="Card image cap">
-                        <div class="card-body">
-                            <h4 class="header-2 color-navy fw-bold mb-3 text-center">Voucher Khusus untuk Perusahaan</h4>
-                            <p class="body-1-card color-navy mb-3 text-center">Kami menyediakan voucher service dan layanan on-site untuk kebutuhan kantor dan perusahaan Anda.</p>
-                            <ul class="body-1-card color-navy mb-5">
-                                <li>Layanan on-site gratis</li>
-                                <li>Harga khusus untuk bulk service</li>
-                                <li>Support teknis 24/7</li>
-                                <li>Maintenance kontrak tahunan</li>
-                            </ul>
-                            <div class="d-grid">
-                                <a href="https://wa.me/6287823330830?text={{ urlencode('*VOUCHER PERUSAHAAN*
+                    <div class="col-lg-5 col-md-6">
+                        <div class="card shadow">
+                            <img class="card-img-top" src="{{ asset('images\diskon2.png') }}" alt="Card image cap">
+                            <div class="card-body">
+                                <h4 class="header-2 color-navy fw-bold mb-3 text-center">Voucher Khusus untuk Perusahaan</h4>
+                                <p class="body-1-card color-navy mb-3 text-center">Kami menyediakan voucher service dan layanan on-site untuk kebutuhan kantor dan perusahaan Anda.</p>
+                                <ul class="body-1-card color-navy mb-5">
+                                    <li>Layanan on-site gratis</li>
+                                    <li>Harga khusus untuk bulk service</li>
+                                    <li>Support teknis 24/7</li>
+                                    <li>Maintenance kontrak tahunan</li>
+                                </ul>
+                                <div class="d-grid">
+                                    <a href="https://wa.me/6287823330830?text={{ urlencode('*VOUCHER PERUSAHAAN*
 
 Halo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.
 
 Kami membutuhkan informasi tentang:
-� Layanan on-site gratis
-� Harga khusus untuk bulk service
-� Support teknis 24/7
-� Maintenance kontrak tahunan
+- Layanan on-site gratis
+- Harga khusus untuk bulk service
+- Support teknis 24/7
+- Maintenance kontrak tahunan
 
 Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!') }}" target="_blank" class="btn btn-primary mb-0">Hubungi Tim Corporate</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </section>
 
-    <section id="testimoni"style="background-image: url('{{ asset('images/BGtesti.png') }}'); ">
+    <section id="testimoni" style="background-image: url('{{ ($testimonialSection && $testimonialSection->background_image) ? $testimonialSection->background_image_url : asset('images/BGtesti.png') }}');">
         <div class="container">
-            <h2 class="header-2 color-neutral fw-bold mb-5 text-center animate-on-scroll fade-in-up">Apa Kata Pelanggan Kami?</h2>
+            @if($testimonialSection && $testimonialSection->title && trim($testimonialSection->title) !== '')
+                <h2 class="header-2 color-neutral fw-bold mb-5 text-center animate-on-scroll fade-in-up">
+                    {{ $testimonialSection->title }}
+                </h2>
+            @else
+                <h2 class="header-2 color-neutral fw-bold mb-5 text-center animate-on-scroll fade-in-up">Apa Kata Pelanggan Kami?</h2>
+            @endif
 
-            <div class="glide-testimoni animate-on-scroll fade-in-up delay-1">
-                <div class="glide__track" data-glide-el="track">
-                    <ul class="glide__slides">
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/sari.png') }}" class="card-img-top" alt="Testimoni Sari">
-                                <div class="card-body text-center">
-                                    <div class="text-warning mb-2">
-                                        <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+            @if($testimonialSection && $testimonialSection->subtitle && trim($testimonialSection->subtitle) !== '')
+                <p class="body-1 color-neutral fw-normal mb-5 text-center animate-on-scroll fade-in-up delay-1">
+                    {{ $testimonialSection->subtitle }}
+                </p>
+            @endif
+
+            @if($testimonials && $testimonials->count() > 0)
+                <div class="glide-testimoni animate-on-scroll fade-in-up delay-1">
+                    <div class="glide__track" data-glide-el="track">
+                        <ul class="glide__slides">
+                            @foreach($testimonials as $testimonial)
+                                <li class="glide__slide">
+                                    <div class="card h-100 shadow-sm">
+                                        <img src="{{ $testimonial->image_url }}" class="card-img-top" alt="Testimoni {{ $testimonial->name }}">
+                                        <div class="card-body text-center">
+                                            <div class="text-warning mb-2">
+                                                {!! $testimonial->stars !!}
+                                            </div>
+                                            <h4 class="card-title header-4 color-navy fw-semibold mb-1">{{ $testimonial->name }}</h4>
+                                            @if($testimonial->content && trim($testimonial->content) !== '')
+                                                <p class="body-2 color-navy mt-2">{{ $testimonial->content }}</p>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <h4 class="card-title header-4 color-navy fw-semibold mb-1">Sari Indrawati</h4>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/rizky.png') }}" class="card-img-top" alt="Testimoni Rizky">
-                                <div class="card-body text-center">
-                                    <div class="text-warning mb-2">
-                                        <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="glide__arrows" data-glide-el="controls">
+                        <button class="glide__arrow glide__arrow--left" data-glide-dir="<"><i class="fas fa-arrow-left"></i></button>
+                        <button class="glide__arrow glide__arrow--right" data-glide-dir=">"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="glide__bullets" data-glide-el="controls[nav]">
+                        @foreach($testimonials as $index => $testimonial)
+                            <button class="glide__bullet" data-glide-dir="={{ $index }}"></button>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                {{-- Fallback to hardcoded testimonials if no data --}}
+                <div class="glide-testimoni animate-on-scroll fade-in-up delay-1">
+                    <div class="glide__track" data-glide-el="track">
+                        <ul class="glide__slides">
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/sari.png') }}" class="card-img-top" alt="Testimoni Sari">
+                                    <div class="card-body text-center">
+                                        <div class="text-warning mb-2">
+                                            <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+                                        </div>
+                                        <h4 class="card-title header-4 color-navy fw-semibold mb-1">Sari Indrawati</h4>
                                     </div>
-                                    <h4 class="card-title header-4 color-navy fw-semibold mb-1">Rizky Pratama</h4>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="glide__slide">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ asset('images/athar.png') }}" class="card-img-top" alt="Testimoni Athar">
-                                <div class="card-body text-center">
-                                    <div class="text-warning mb-2">
-                                        <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+                            </li>
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/rizky.png') }}" class="card-img-top" alt="Testimoni Rizky">
+                                    <div class="card-body text-center">
+                                        <div class="text-warning mb-2">
+                                            <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+                                        </div>
+                                        <h4 class="card-title header-4 color-navy fw-semibold mb-1">Rizky Pratama</h4>
                                     </div>
-                                    <h4 class="card-title header-4 color-navy fw-semibold mb-1">Athar Hilman</h4>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
+                            </li>
+                            <li class="glide__slide">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ asset('images/athar.png') }}" class="card-img-top" alt="Testimoni Athar">
+                                    <div class="card-body text-center">
+                                        <div class="text-warning mb-2">
+                                            <i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star me-1"></i><i class="fas fa-star"></i>
+                                        </div>
+                                        <h4 class="card-title header-4 color-navy fw-semibold mb-1">Athar Hilman</h4>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glide__arrows" data-glide-el="controls">
+                        <button class="glide__arrow glide__arrow--left" data-glide-dir="<"><i class="fas fa-arrow-left"></i></button>
+                        <button class="glide__arrow glide__arrow--right" data-glide-dir=">"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="glide__bullets" data-glide-el="controls[nav]">
+                        <button class="glide__bullet" data-glide-dir="=0"></button>
+                        <button class="glide__bullet" data-glide-dir="=1"></button>
+                        <button class="glide__bullet" data-glide-dir="=2"></button>
+                    </div>
                 </div>
-                <div class="glide__arrows" data-glide-el="controls">
-                    <button class="glide__arrow glide__arrow--left" data-glide-dir="<"><i class="fas fa-arrow-left"></i></button>
-                    <button class="glide__arrow glide__arrow--right" data-glide-dir=">"><i class="fas fa-arrow-right"></i></button>
-                </div>
-                <div class="glide__bullets" data-glide-el="controls[nav]">
-                    <button class="glide__bullet" data-glide-dir="=0"></button>
-                    <button class="glide__bullet" data-glide-dir="=1"></button>
-                    <button class="glide__bullet" data-glide-dir="=2"></button>
-                </div>
-            </div>
+            @endif
         </div>
     </section>
 
@@ -459,30 +605,59 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
         <div class="container">
             <div class="row align-items-center gy-4">
                 <div class="col-lg-6 d-none d-lg-block animate-on-scroll fade-in-left">
-                    <img src="{{ asset('images\aboutUS.png') }}" class="img-fluid tim-img" alt="Tim Teknisi">
+                    <img src="{{ $aboutSection ? $aboutSection->image_url : asset('images/aboutUS.png') }}" class="img-fluid tim-img" alt="Tim Teknisi">
                 </div>
                 <div class="col-lg-6 animate-on-scroll fade-in-right">
-                    <h2 class="header-2 color-navy fw-bold mb-3">Tentang Kami</h2>
-                    <img src="{{ asset('images\aboutUS.png') }}" class="img-fluid d-lg-none tim-img mb-3" alt="Teknisi sedang bekerja">
-                    <p class="body-1 color-navy">Kami adalah tim teknisi laptop profesional yang berdedikasi untuk memberikan layanan terbaik sejak 2010. Dengan pengalaman bertahun-tahun dan ribuan laptop yang telah kami tangani, kami mengutamakan kejujuran, transparansi, dan kualitas.</p>
-                    <p class="body-1 color-navy">Kami percaya bahwa laptop Anda bukan sekadar alat kerja, tapi aset penting yang harus dijaga. Setiap perangkat memiliki cerita dan memori berharga bagi pemiliknya. Itulah mengapa kami memperlakukan setiap perbaikan dengan penuh perhatian dan profesionalisme.</p>
-                    <p class="body-1 color-navy">Tim kami terdiri dari teknisi bersertifikat yang terus mengikuti perkembangan teknologi terbaru. Kami menggunakan alat diagnostik mutakhir dan komponen berkualitas tinggi untuk memastikan laptop Anda kembali berfungsi optimal.</p>
-                    <ul class="body-1-card color-navy mb-3">
-                        <li><b>Kejujuran - </b>Diagnosa masalah yang transparan tanpa biaya tersembunyi.</li>
-                        <li><b>Profesionalisme - </b>Teknisi bersertifikasi dengan pelatihan berkala.</li>
-                        <li><b>Garansi - </b>Jaminan 90 hari untuk setiap perbaikan.</li>
-                        <li><b>Efisiensi - </b>Waktu perbaikan cepat tanpa mengorbankan kualitas.</li>
-                    </ul>
+                    <h2 class="header-2 color-navy fw-bold mb-3">{{ $aboutSection ? $aboutSection->title : 'Tentang Kami' }}</h2>
+                    <img src="{{ $aboutSection ? $aboutSection->image_url : asset('images/aboutUS.png') }}" class="img-fluid d-lg-none tim-img mb-3" alt="Teknisi sedang bekerja">
+                    
+                    @if($aboutSection && $aboutSection->content)
+                        {!! $aboutSection->content !!}
+                    @else
+                        <p class="body-1 color-navy">Kami adalah tim teknisi laptop profesional yang berdedikasi untuk memberikan layanan terbaik sejak 2010. Dengan pengalaman bertahun-tahun dan ribuan laptop yang telah kami tangani, kami mengutamakan kejujuran, transparansi, dan kualitas.</p>
+                        <p class="body-1 color-navy">Kami percaya bahwa laptop Anda bukan sekadar alat kerja, tapi aset penting yang harus dijaga. Setiap perangkat memiliki cerita dan memori berharga bagi pemiliknya. Itulah mengapa kami memperlakukan setiap perbaikan dengan penuh perhatian dan profesionalisme.</p>
+                        <p class="body-1 color-navy">Tim kami terdiri dari teknisi bersertifikat yang terus mengikuti perkembangan teknologi terbaru. Kami menggunakan alat diagnostik mutakhir dan komponen berkualitas tinggi untuk memastikan laptop Anda kembali berfungsi optimal.</p>
+                        <ul class="body-1-card color-navy mb-3">
+                            <li><b>Kejujuran - </b>Diagnosa masalah yang transparan tanpa biaya tersembunyi.</li>
+                            <li><b>Profesionalisme - </b>Teknisi bersertifikasi dengan pelatihan berkala.</li>
+                            <li><b>Garansi - </b>Jaminan 90 hari untuk setiap perbaikan.</li>
+                            <li><b>Efisiensi - </b>Waktu perbaikan cepat tanpa mengorbankan kualitas.</li>
+                        </ul>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="cta-penutup" style="background-image: url('{{ asset('images/BGalur.png') }}'); ">
-        <div class="container text-center">
-            <h1 class="header-2 fw-bold mb-4">Jangan tunggu kerusakan makin parah, segera hubungi kami sekarang!</h1>
-        </div>
-    </section>
+    {{-- Dynamic CTA Section --}}
+    @if($ctaSection)
+        <section id="cta-section" class="cta-section" 
+            style="background-image: url('{{ $ctaSection->background_image_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <div class="container text-center">
+                <h1 class="header-2 fw-bold mb-4 text-white animate-on-scroll fade-in-up">{{ $ctaSection->title }}</h1>
+            </div>
+        </section>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @else
+        {{-- Fallback CTA Section --}}
+        <section id="cta-penutup" style="background-image: url('{{ asset('images/BGalur.png') }}'); ">
+            <div class="container text-center">
+                <h1 class="header-2 fw-bold mb-4 text-white">Jangan tunggu kerusakan makin parah, segera hubungi kami sekarang!</h1>
+                <div>
+                    <a href="#kontak" class="btn btn-accent btn-lg me-3">
+                        <i class="fas fa-phone me-2"></i>Hubungi Sekarang
+                    </a>
+                    <a href="https://wa.me/6281234567890" target="_blank" class="btn btn-outline-light btn-lg">
+                        <i class="fab fa-whatsapp me-2"></i>Chat WhatsApp
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
 
     <section id="kontak">
         <div class="container">
@@ -637,30 +812,71 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
 
                 <div class="col-lg-5 animate-on-scroll fade-in-right">
                     <h3 class="header-4 color-navy fw-semibold mb-4">Informasi Kontak</h3>
-                    <div class="d-flex mb-3">
-                        <i class="fab fa-whatsapp fa-2x color-accent me-2"></i>
-                        <div>
-                            <h4 class="header-4 color-navy fw-semibold mb-1">WhatsApp</h4>
-                            <a href="https://wa.me/6281234567890" target="_blank" class="body-1-card text-decoration-none color-navy">+62 812-3456-7890</a>
+                    @if($contactInfos && $contactInfos->count() > 0)
+                        @foreach($contactInfos as $contactInfo)
+                            <div class="d-flex mb-3">
+                                @if($contactInfo->icon_url)
+                                    <img src="{{ $contactInfo->icon_url }}" alt="{{ $contactInfo->title }} Icon" style="width: 36px; height: 36px; object-fit: contain;" class="me-3">
+                                @else
+                                    <i class="fas fa-info-circle fa-2x color-accent me-3"></i>
+                                @endif
+                                <div>
+                                    <h4 class="header-4 color-navy fw-semibold mb-1">{{ $contactInfo->title }}</h4>
+                                    @if($contactInfo->link)
+                                        <a href="{{ $contactInfo->link }}" target="_blank" class="body-1-card text-decoration-none color-navy">{{ $contactInfo->content }}</a>
+                                    @else
+                                        <p class="body-1-card color-navy mb-0">{{ $contactInfo->content }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <!-- Fallback content if no contact info data -->
+                        <div class="d-flex mb-3">
+                            <i class="fab fa-whatsapp fa-2x color-accent me-3"></i>
+                            <div>
+                                <h4 class="header-4 color-navy fw-semibold mb-1">WhatsApp</h4>
+                                <a href="https://wa.me/6281234567890" target="_blank" class="body-1-card text-decoration-none color-navy">+62 812-3456-7890</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                        <i class="far fa-envelope fa-2x color-accent me-2"></i>
-                        <div>
-                            <h4 class="header-4 color-navy fw-semibold mb-1">Email</h4>
-                            <p class="body-1-card color-navy mb-0">support@servicelaptop.com</p>
+                        <div class="d-flex mb-3">
+                            <i class="far fa-envelope fa-2x color-accent me-3"></i>
+                            <div>
+                                <h4 class="header-4 color-navy fw-semibold mb-1">Email</h4>
+                                <p class="body-1-card color-navy mb-0">support@servicelaptop.com</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex">
-                        <i class="fas fa-map-marker-alt fa-2x color-accent me-3"></i>
-                        <div>
-                            <h4 class="header-4 color-navy fw-semibold mb-1">Lokasi</h4>
-                            <p class="body-1-card color-navy mb-3">
-                                Jalan traktor 123 dekat cicukang belakang kantor PU ujung berung, Kec. Arcamanik, Kota Bandung, Jawa Barat 42094
-                            </p>
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-map-marker-alt fa-2x color-accent me-3"></i>
+                            <div>
+                                <h4 class="header-4 color-navy fw-semibold mb-1">Lokasi</h4>
+                                <p class="body-1-card color-navy mb-0">
+                                    Jalan traktor 123 dekat cicukang belakang kantor PU ujung berung, Kec. Arcamanik, Kota Bandung, Jawa Barat 42094
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8093.253222490186!2d107.67920589074849!3d-6.915002802991967!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68dda5a21cc6bb%3A0xb7248e14780c4720!2sCV%20Lingkar%20Rasio%20Teknologi!5e0!3m2!1sid!2sid!4v1755229414217!5m2!1sid!2sid" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    @endif
+                    
+                    @if($contactSection && $contactSection->is_active && $contactSection->maps_embed_url)
+                        <iframe src="{{ $contactSection->maps_embed_url }}" 
+                                width="100%" 
+                                height="300" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    @else
+                        <!-- Fallback maps if no contact section data -->
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8093.253222490186!2d107.67920589074849!3d-6.915002802991967!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68dda5a21cc6bb%3A0xb7248e14780c4720!2sCV%20Lingkar%20Rasio%20Teknologi!5e0!3m2!1sid!2sid!4v1755229414217!5m2!1sid!2sid" 
+                                width="100%" 
+                                height="300" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    @endif
                 </div>
             </div>
         </div>
@@ -693,11 +909,17 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     startAt: 0,
                     perView: 3,
                     gap: 8,
-                    autoplay: 3500,
+                    autoplay: @if($testimonials && $testimonials->count() > 3) 3500 @else false @endif,
                     hoverpause: true,
                     breakpoints: {
-                        992: { perView: 2 },
-                        768: { perView: 1 }
+                        992: { 
+                            perView: 2,
+                            autoplay: @if($testimonials && $testimonials->count() > 2) 3500 @else false @endif
+                        },
+                        768: { 
+                            perView: 1,
+                            autoplay: @if($testimonials && $testimonials->count() > 1) 3500 @else false @endif
+                        }
                     }
                 }).mount();
             });
@@ -1204,7 +1426,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     messagesContainer.innerHTML = ''; // Clear any corrupted content
                     
                     setTimeout(() => {
-                        addBotMessage('Halo! Saya LASO, asisten virtual LaptopService ??');
+                        addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
                         setTimeout(() => {
                             addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
                                 {text: 'Service Laptop', action: 'service_laptop'},
@@ -1324,16 +1546,30 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     }, 1000);
                 } else if (action === 'promo_maintenance') {
                     setTimeout(() => {
-                        addBotMessage('?? Promo Maintenance Rutin! Hemat hingga 20% untuk perawatan berkala:\n\n� Pembersihan menyeluruh sistem\n� Update software terbaru\n� Optimasi performa\n� Garansi layanan 30 hari\n\nMau langsung booking maintenance atau lanjut service biasa?', true, [
-                            {text: '?? Booking Maintenance', action: 'booking_maintenance'},
-                            {text: '?? Lanjut Service Biasa', action: 'skip_promo'}
+                        addBotMessage(`🎉 Promo Maintenance Rutin! Hemat hingga 20% untuk perawatan berkala:
+
+• Pembersihan menyeluruh sistem
+• Update software terbaru
+• Optimasi performa
+• Garansi layanan 30 hari
+
+Mau langsung booking maintenance atau lanjut service biasa?`, true, [
+                            {text: '📅 Booking Maintenance', action: 'booking_maintenance'},
+                            {text: '🔧 Lanjut Service Biasa', action: 'skip_promo'}
                         ]);
                     }, 1000);
                 } else if (action === 'promo_corporate') {
                     setTimeout(() => {
-                        addBotMessage('?? Voucher Perusahaan! Khusus untuk kebutuhan kantor:\n\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nMau konsultasi corporate atau lanjut service individu?', true, [
-                            {text: '?? Konsultasi Corporate', action: 'corporate_consultation'},
-                            {text: '?? Service Individu', action: 'skip_promo'}
+                        addBotMessage(`🏢 Voucher Perusahaan! Khusus untuk kebutuhan kantor:
+
+• Layanan on-site gratis
+• Harga khusus untuk bulk service
+• Support teknis 24/7
+• Maintenance kontrak tahunan
+
+Mau konsultasi corporate atau lanjut service individu?`, true, [
+                            {text: '💼 Konsultasi Corporate', action: 'corporate_consultation'},
+                            {text: '👤 Service Individu', action: 'skip_promo'}
                         ]);
                     }, 1000);
                 } else if (action === 'booking_maintenance') {
@@ -1345,7 +1581,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 } else if (action === 'corporate_consultation') {
                     setTimeout(() => {
                         addBotMessage('Terima kasih! Untuk konsultasi corporate, saya akan hubungkan dengan tim khusus kami.');
-                        sendToWhatsApp('*KONSULTASI CORPORATE*\n\nHalo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.\n\nKami membutuhkan informasi tentang:\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nMohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!');
+                        sendToWhatsApp('*KONSULTASI CORPORATE*\\n\\nHalo, saya mewakili perusahaan yang tertarik dengan voucher khusus untuk layanan corporate.\\n\\nKami membutuhkan informasi tentang:\\n• Layanan on-site gratis\\n• Harga khusus untuk bulk service\\n• Support teknis 24/7\\n• Maintenance kontrak tahunan\\n\\nMohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!');
                     }, 1000);
                 } else if (action === 'skip_promo') {
                     setTimeout(() => {
@@ -1358,13 +1594,13 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     
                     if (action === 'laptop_on') {
                         conditionText = 'Masih menyala normal';
-                        responseMessage = 'Bagus sekali! Laptop yang masih menyala memudahkan proses diagnosis dan biasanya lebih cepat selesai ??';
+                        responseMessage = 'Bagus sekali! Laptop yang masih menyala memudahkan proses diagnosis dan biasanya lebih cepat selesai 👍';
                     } else if (action === 'laptop_partially') {
                         conditionText = 'Menyala tapi bermasalah';
-                        responseMessage = 'Oke, laptop masih hidup tapi ada gangguannya ya. Ini sebenarnya kondisi yang baik untuk diperbaiki ??';
+                        responseMessage = 'Oke, laptop masih hidup tapi ada gangguannya ya. Ini sebenarnya kondisi yang baik untuk diperbaiki 💪';
                     } else {
                         conditionText = 'Tidak bisa menyala';
-                        responseMessage = 'Hmm, laptop mati total memang tricky. Tapi tenang, teknisi kami sudah berpengalaman puluhan tahun menangani kasus seperti ini! ??';
+                        responseMessage = 'Hmm, laptop mati total memang tricky. Tapi tenang, teknisi kami sudah berpengalaman puluhan tahun menangani kasus seperti ini! 🔧';
                     }
                     
                     userInputs.condition = conditionText;
@@ -1378,16 +1614,32 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     }, 1000);
                 } else if (action === 'show_promo_maintenance') {
                     setTimeout(() => {
-                        addBotMessage('?? Promo Maintenance Rutin!\n\nHemat hingga 20% untuk perawatan berkala laptop Anda:\n� Pembersihan menyeluruh sistem\n� Update software terbaru\n� Optimasi performa\n� Garansi layanan 30 hari\n\nApakah Anda tertarik dengan promo ini?', true, [
-                            {text: '? Ya, Tertarik!', action: 'interested_maintenance'},
-                            {text: '?? Tidak, Lanjut Service', action: 'continue_to_name'}
+                        addBotMessage(`🎉 Promo Maintenance Rutin!
+
+Hemat hingga 20% untuk perawatan berkala laptop Anda:
+• Pembersihan menyeluruh sistem
+• Update software terbaru
+• Optimasi performa
+• Garansi layanan 30 hari
+
+Apakah Anda tertarik dengan promo ini?`, true, [
+                            {text: '✅ Ya, Tertarik!', action: 'interested_maintenance'},
+                            {text: '⏭️ Tidak, Lanjut Service', action: 'continue_to_name'}
                         ]);
                     }, 1000);
                 } else if (action === 'show_promo_corporate') {
                     setTimeout(() => {
-                        addBotMessage('?? Voucher Perusahaan!\n\nLayanan khusus untuk kebutuhan kantor:\n� Layanan on-site gratis\n� Harga khusus untuk bulk service\n� Support teknis 24/7\n� Maintenance kontrak tahunan\n\nApakah ini untuk kebutuhan perusahaan?', true, [
-                            {text: '? Ya, Untuk Perusahaan', action: 'corporate_interest'},
-                            {text: '?? Tidak, Service Pribadi', action: 'continue_to_name'}
+                        addBotMessage(`🏢 Voucher Perusahaan!
+
+Layanan khusus untuk kebutuhan kantor:
+• Layanan on-site gratis
+• Harga khusus untuk bulk service
+• Support teknis 24/7
+• Maintenance kontrak tahunan
+
+Apakah ini untuk kebutuhan perusahaan?`, true, [
+                            {text: '✅ Ya, Untuk Perusahaan', action: 'corporate_interest'},
+                            {text: '👤 Tidak, Service Pribadi', action: 'continue_to_name'}
                         ]);
                     }, 1000);
                 } else if (action === 'interested_maintenance') {
@@ -1421,14 +1673,14 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     // Copy message to clipboard as fallback
                     let message = userInputs.finalMessage || '';
                     if (userInputs.notaNumber) {
-                        message += `\n\n*?? NOMOR NOTA: ${userInputs.notaNumber}*\n`;
+                        message += `\\n\\n*📋 NOMOR NOTA: ${userInputs.notaNumber}*\\n`;
                         message += `_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_`;
                     }
                     
                     navigator.clipboard.writeText(message).then(() => {
-                        addBotMessage('? Pesan berhasil disalin! Silakan paste di WhatsApp manual ke: 087823330830');
+                        addBotMessage('✅ Pesan berhasil disalin! Silakan paste di WhatsApp manual ke: 087823330830');
                     }).catch(() => {
-                        addBotMessage('? Gagal copy otomatis. Silakan hubungi WhatsApp: 087823330830');
+                        addBotMessage('❌ Gagal copy otomatis. Silakan hubungi WhatsApp: 087823330830');
                     });
                 }
             }
@@ -1515,7 +1767,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                     defaultSubmitBtn.style.display = 'block';
                 }
                 
-                // If brand dropdown, setup brands with static data
+                // If brand dropdown, setup static brands
                 if (inputType === 'brand') {
                     setupBrands();
                 }
@@ -1538,16 +1790,30 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
             // Function to setup brands dropdown with database data
             function setupBrands() {
                 const brandSelect = document.getElementById('chat-brand');
-                brandSelect.innerHTML = '<option value="">Pilih merek laptop Anda</option>';
-                
-                // Add brands from database
-                @foreach($brands as $brand)
-                    brandSelect.innerHTML += '<option value="{{ $brand }}">{{ $brand }}</option>';
-                @endforeach
-                
-                // Add "Lainnya" option
-                brandSelect.innerHTML += '<option value="Lainnya">Lainnya</option>';
-            }
+                if (brandSelect) {
+                    let brandOptions = '<option value="">Pilih merek laptop Anda</option>';
+                    
+                    @if(isset($brands) && $brands->count())
+                        @foreach($brands as $brandOption)
+                            brandOptions += '<option value="{{ $brandOption }}">{{ $brandOption }}</option>';
+                        @endforeach
+                    @else
+                        // Fallback to common brands if DB has none
+                        brandOptions += '<option value="ASUS">ASUS</option>';
+                        brandOptions += '<option value="Acer">Acer</option>';
+                        brandOptions += '<option value="Lenovo">Lenovo</option>';
+                        brandOptions += '<option value="HP">HP</option>';
+                        brandOptions += '<option value="Dell">Dell</option>';
+                        brandOptions += '<option value="Toshiba">Toshiba</option>';
+                        brandOptions += '<option value="Samsung">Samsung</option>';
+                        brandOptions += '<option value="Apple">Apple (MacBook)</option>';
+                        brandOptions += '<option value="MSI">MSI</option>';
+                        brandOptions += '<option value="Alienware">Alienware</option>';
+                    @endif
+                    
+                    brandOptions += '<option value="Lainnya">Lainnya</option>';
+                    brandSelect.innerHTML = brandOptions;
+                }
             }
 
             chatDataForm.onsubmit = function(e) {
@@ -1587,26 +1853,30 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 setTimeout(() => {
                     if (lastInput === 'reported_issue') {
                         addBotMessage('Wah, saya paham situasinya. Sekarang laptop Anda kondisinya bagaimana?', true, [
-                            {text: '?? Masih Bisa Menyala Normal', action: 'laptop_on'},
-                            {text: '?? Menyala Tapi Ada Masalah', action: 'laptop_partially'},
-                            {text: '?? Tidak Bisa Menyala Sama Sekali', action: 'laptop_off'}
+                            {text: '💚 Masih Bisa Menyala Normal', action: 'laptop_on'},
+                            {text: '🟡 Menyala Tapi Ada Masalah', action: 'laptop_partially'},
+                            {text: '🔴 Tidak Bisa Menyala Sama Sekali', action: 'laptop_off'}
                         ]);
                     } else if (lastInput === 'brand') {
-                        addBotMessage('Good! Tipe atau seri berapa laptop Anda? Ini penting untuk persiapan spare part dan tools khusus ??');
+                        addBotMessage('Good! Tipe atau seri berapa laptop Anda? Ini penting untuk persiapan spare part dan tools khusus 🔧');
                         showInputForm('model');
                     } 
                     else if (lastInput === 'model') {
-                        addBotMessage('Sebelum kita lanjut, mungkin Anda tertarik dengan promo spesial kami? ??', true, [
+                        addBotMessage('Sebelum kita lanjut, mungkin Anda tertarik dengan promo spesial kami? 🎉', true, [
                             {text: 'Maintenance Rutin (Hemat 20%)', action: 'show_promo_maintenance'},
                             {text: 'Voucher Perusahaan', action: 'show_promo_corporate'},
                             {text: 'Tidak, Lanjut Aja', action: 'continue_to_name'}
                         ]);
 
                     } else if (lastInput === 'name') {
-                        addBotMessage(`Hai ${userInputs.name}! Senang bisa bantu Anda hari ini ??\n\nNomor WhatsApp berapa yang aktif untuk koordinasi nanti?`);
+                        addBotMessage(`Hai ${userInputs.name}! Senang bisa bantu Anda hari ini 😊
+
+Nomor WhatsApp berapa yang aktif untuk koordinasi nanti?`);
                         showInputForm('phone');
                     } else if (lastInput === 'phone') {
-                        addBotMessage('Mantap! Workshop kami buka setiap hari jam 08.00-20.00. Alamat ada di Google Maps dengan nama "LaptopService". \n\nSebentar ya, saya buatkan ringkasan ordernya...');
+                        addBotMessage(`Mantap! Workshop kami buka setiap hari jam 08.00-20.00. Alamat ada di Google Maps dengan nama "LaptopService". 
+
+Sebentar ya, saya buatkan ringkasan ordernya...`);
                         
                         // Generate nota number and save to database after phone input
                         setTimeout(async () => {
@@ -1617,7 +1887,11 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                                 
                                 if (saveResult.success && saveResult.nota_number) {
                                     userInputs.notaNumber = saveResult.nota_number;
-                                    addBotMessage(`? Data Anda berhasil tersimpan!\n\n?? **Nomor Nota: ${saveResult.nota_number}**\n\nSimpan nomor nota ini untuk melacak status pengerjaan laptop Anda.`);
+                                    addBotMessage(`✅ Data Anda berhasil tersimpan!
+
+📋 **Nomor Nota: ${saveResult.nota_number}**
+
+Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda.`);
                                     
                                     // Continue with final message generation
                                     setTimeout(async () => {
@@ -1654,54 +1928,73 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 
                 // Header based on service type
                 if (userInputs.serviceType === 'maintenance') {
-                    message = `*BOOKING MAINTENANCE RUTIN (HEMAT 20%)*\n\n`;
+                    message = `*BOOKING MAINTENANCE RUTIN (HEMAT 20%)*\\n\\n`;
                 } else if (userInputs.serviceType === 'corporate') {
-                    message = `*KONSULTASI LAYANAN CORPORATE*\n\n`;
+                    message = `*KONSULTASI LAYANAN CORPORATE*
+
+`;
                 } else {
-                    message = `*PEMESANAN SERVICE LAPTOP*\n\n`;
+                    message = `*PEMESANAN SERVICE LAPTOP*
+
+`;
                 }
                 
-                message += `*Nama:* ${userInputs.name}\n`;
-                message += `*WhatsApp:* ${userInputs.phone}\n`;
-                message += `*Merek Laptop:* ${userInputs.brand}\n`;
-                message += `*Model/Type:* ${userInputs.model}\n`;
-                message += `*Keluhan:* ${userInputs.reported_issue}\n`;
+                message += `*Nama:* ${userInputs.name}
+`;
+                message += `*WhatsApp:* ${userInputs.phone}
+`;
+                message += `*Merek Laptop:* ${userInputs.brand}
+`;
+                message += `*Model/Type:* ${userInputs.model}
+`;
+                message += `*Keluhan:* ${userInputs.reported_issue}
+`;
                 
                 if (userInputs.condition) {
-                    message += `*Kondisi Saat Ini:* ${userInputs.condition}\n`;
+                    message += `*Kondisi Saat Ini:* ${userInputs.condition}
+`;
                 }
                 
                 // Add promo section based on service type
                 if (userInputs.serviceType === 'maintenance') {
-                    message += `\n*PROMO MAINTENANCE RUTIN YANG DIPILIH:*\n`;
-                    message += `- Hemat hingga 20% untuk perawatan berkala\n`;
-                    message += `- Pembersihan menyeluruh sistem\n`;
-                    message += `- Update software terbaru\n`;
-                    message += `- Optimasi performa\n`;
-                    message += `- Garansi layanan 30 hari\n`;
-                    message += `*Promo ini berlaku untuk kunjungan ke-2 dan seterusnya*\n`;
+                    message += `
+*PROMO MAINTENANCE RUTIN YANG DIPILIH:*
+• Hemat hingga 20% untuk perawatan berkala
+• Pembersihan menyeluruh sistem
+• Update software terbaru
+• Optimasi performa
+• Garansi layanan 30 hari
+*Promo ini berlaku untuk kunjungan ke-2 dan seterusnya*
+`;
                 } else if (userInputs.serviceType === 'corporate') {
-                    message += `\n*PAKET CORPORATE YANG DIMINATI:*\n`;
-                    message += `- Layanan on-site gratis\n`;
-                    message += `- Harga khusus untuk bulk service\n`;
-                    message += `- Support teknis 24/7\n`;
-                    message += `- Maintenance kontrak tahunan\n`;
-                    message += `*Tim corporate kami akan segera menghubungi untuk penawaran khusus*\n`;
+                    message += `
+*PAKET CORPORATE YANG DIMINATI:*
+• Layanan on-site gratis
+• Harga khusus untuk bulk service
+• Support teknis 24/7
+• Maintenance kontrak tahunan
+*Tim corporate kami akan segera menghubungi untuk penawaran khusus*
+`;
                 } else {
-                    message += `\n*LAYANAN REGULAR SERVICE*\n`;
-                    message += `- Teknisi berpengalaman\n`;
-                    message += `- Sparepart original\n`;
-                    message += `- Garansi service\n`;
-                    message += `- Gratis cek & konsultasi`;
+                    message += `
+*LAYANAN REGULAR SERVICE*
+• Teknisi berpengalaman
+• Sparepart original
+• Garansi service
+• Gratis cek & konsultasi`;
                 }
                 
                 // Add nota number BEFORE confirmation message if available
                 if (userInputs.notaNumber) {
-                    message += `\n\n*NOMOR NOTA: ${userInputs.notaNumber}*\n`;
-                    message += `_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_\n`;
+                    message += `
+
+*NOMOR NOTA: ${userInputs.notaNumber}*
+_Simpan nomor nota ini untuk melacak status pengerjaan laptop Anda di website kami_
+`;
                 }
                 
-                message += `\n_Mohon konfirmasi untuk memproses order Anda. Tim kami akan segera menghubungi untuk koordinasi lebih lanjut. Terima kasih!_`;
+                message += `
+_Mohon konfirmasi untuk memproses order Anda. Tim kami akan segera menghubungi untuk koordinasi lebih lanjut. Terima kasih!_`;
                 
                 addBotMessage('Sempurna! Saya sudah siapkan ringkasan ordernya dengan estimasi berdasarkan kondisi laptop Anda', true, [
                     {text: 'Kirim ke WhatsApp', action: 'send_whatsapp'},
@@ -1926,7 +2219,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 resetChat();
                 // Re-initialize with fresh state
                 setTimeout(() => {
-                    addBotMessage('Halo! Saya LASO, asisten virtual LaptopService ??');
+                    addBotMessage('Halo! Saya LASO, asisten virtual LaptopService 👋');
                     setTimeout(() => {
                         addBotMessage('Saya siap membantu Anda dengan layanan service laptop profesional. Ada yang bisa saya bantu?', true, [
                             {text: 'Service Laptop', action: 'service_laptop'},
@@ -1951,153 +2244,7 @@ Mohon tim corporate menghubungi kami untuk diskusi lebih lanjut. Terima kasih!')
                 }
             });
         });
-        
-        // IndoRegion Server-side Form System  
-        $(document).ready(function() {
-            // Province change handler - reload page with regency data
-            $('#province_id').on('change', function() {
-                const provinceId = $(this).val();
-                if (provinceId) {
-                    // Show regency group immediately
-                    $('#regency-group').slideDown(300);
-                    
-                    // Create form to reload with regency data
-                    const form = $('<form>', {
-                        method: 'GET',
-                        action: '{{ url("/") }}'
-                    });
-                    
-                    form.append($('<input>', {
-                        type: 'hidden',
-                        name: 'province_id',
-                        value: provinceId
-                    }));
-                    
-                    // Add current form data to preserve it
-                    const name = $('#name').val();
-                    const phone = $('#phone').val();
-                    const email = $('#email').val();
-                    
-                    if (name) form.append($('<input>', {type: 'hidden', name: 'name', value: name}));
-                    if (phone) form.append($('<input>', {type: 'hidden', name: 'phone', value: phone}));
-                    if (email) form.append($('<input>', {type: 'hidden', name: 'email', value: email}));
-                    
-                    $('body').append(form);
-                    form.submit();
-                } else {
-                    hideFieldsAfter('regency-group');
-                }
-                updateAddressField();
-            });
-            
-            // Regency change handler - reload page with district data
-            $('#regency_id').on('change', function() {
-                const regencyId = $(this).val();
-                const provinceId = $('#province_id').val();
-                
-                if (regencyId) {
-                    // Show district group and street address immediately
-                    $('#district-group').slideDown(300);
-                    $('#street-address-group').slideDown(300);
-                    
-                    // Create form to reload with district data
-                    const form = $('<form>', {
-                        method: 'GET',
-                        action: '{{ url("/") }}'
-                    });
-                    
-                    form.append($('<input>', {type: 'hidden', name: 'province_id', value: provinceId}));
-                    form.append($('<input>', {type: 'hidden', name: 'regency_id', value: regencyId}));
-                    
-                    // Add current form data to preserve it
-                    const name = $('#name').val();
-                    const phone = $('#phone').val();
-                    const email = $('#email').val();
-                    const streetAddress = $('#street_address').val();
-                    
-                    if (name) form.append($('<input>', {type: 'hidden', name: 'name', value: name}));
-                    if (phone) form.append($('<input>', {type: 'hidden', name: 'phone', value: phone}));
-                    if (email) form.append($('<input>', {type: 'hidden', name: 'email', value: email}));
-                    if (streetAddress) form.append($('<input>', {type: 'hidden', name: 'street_address', value: streetAddress}));
-                    
-                    $('body').append(form);
-                    form.submit();
-                } else {
-                    hideFieldsAfter('district-group');
-                }
-                updateAddressField();
-            });
-            
-            // District change handler
-            $('#district_id').on('change', function() {
-                updateAddressField();
-            });
-            
-            // Street address change handler
-            $('#street_address').on('input', function() {
-                updateAddressField();
-            });
-            
-            // Populate preserved form data from URL parameters
-            @if(request()->has('name'))
-                $('#name').val('{{ request("name") }}');
-            @endif
-            @if(request()->has('phone'))
-                $('#phone').val('{{ request("phone") }}');
-            @endif
-            @if(request()->has('email'))
-                $('#email').val('{{ request("email") }}');
-            @endif
-            @if(request()->has('street_address'))
-                $('#street_address').val('{{ request("street_address") }}');
-            @endif
-            
-            function hideFieldsAfter(fieldId) {
-                const fields = ['regency-group', 'district-group', 'street-address-group'];
-                const currentIndex = fields.indexOf(fieldId);
-                
-                for (let i = currentIndex; i < fields.length; i++) {
-                    const field = $('#' + fields[i]);
-                    field.slideUp(300);
-                    
-                    // Reset field values
-                    if (fields[i] === 'regency-group') {
-                        $('#regency_id').val('').prop('disabled', true);
-                    } else if (fields[i] === 'district-group') {
-                        $('#district_id').val('').prop('disabled', true);
-                    } else if (fields[i] === 'street-address-group') {
-                        $('#street_address').val('');
-                    }
-                }
-            }
-            
-            function updateAddressField() {
-                const province = $('#province_id option:selected').text();
-                const regency = $('#regency_id option:selected').text();
-                const district = $('#district_id option:selected').text();
-                const streetAddress = $('#street_address').val();
-                
-                let fullAddress = '';
-                
-                if (streetAddress) {
-                    fullAddress = streetAddress;
-                }
-                if (district && district !== 'Pilih Kecamatan... (Opsional)') {
-                    fullAddress += (fullAddress ? ', ' : '') + district;
-                }
-                if (regency && regency !== 'Pilih Kabupaten/Kota...') {
-                    fullAddress += (fullAddress ? ', ' : '') + regency;
-                }
-                if (province && province !== 'Pilih Provinsi...') {
-                    fullAddress += (fullAddress ? ', ' : '') + province;
-                }
-                
-                $('#address').val(fullAddress);
-            }
-            
-            // Initialize address field on page load
-            updateAddressField();
-        });
         </script>
     </section>
+
 </x-client.layout>

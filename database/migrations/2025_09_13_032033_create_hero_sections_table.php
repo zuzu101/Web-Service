@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('hero_sections', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('title2')->nullable();
             $table->text('description');
             $table->string('image1')->nullable();
-            $table->string('image2')->nullable();
+            // image2 dihapus sesuai migrasi terakhir
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

@@ -348,6 +348,58 @@
     color: var(--neutral);
 }
 
+/* CTA Section */
+.cta-section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+    position: relative;
+    color: var(--neutral);
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.cta-overlay {
+    position: relative;
+    /* background: rgba(0, 0, 0, 0.5); */ /* Remove dark overlay */
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.cta-section .btn-accent {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--neutral);
+    font-family: var(--font-2);
+    transition: var(--transition);
+    font-size: 16px;
+    padding: 12px 30px;
+    font-weight: 600;
+    position: relative;
+}
+
+.cta-section .btn-accent:hover {
+    background-color: var(--navy);
+    border-color: var(--navy);
+    color: var(--neutral);
+}
+
+.cta-section .btn-outline-light {
+    border-color: var(--neutral);
+    color: var(--neutral);
+    font-family: var(--font-2);
+    transition: var(--transition);
+    font-size: 16px;
+    padding: 12px 30px;
+    font-weight: 600;
+}
+
+.cta-section .btn-outline-light:hover {
+    background-color: var(--neutral);
+    border-color: var(--neutral);
+    color: var(--navy);
+}
+
 #cta-penutup .btn-primary {
     background-color: var(--neutral);
     color: var(--accent);

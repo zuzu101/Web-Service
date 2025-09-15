@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->dropUnique(['email']); // Remove unique constraint from email field
+        Schema::table('contact_infos', function (Blueprint $table) {
+            $table->string('icon', 500)->nullable()->change(); // Allow longer path for image files
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->unique('email'); // Add back unique constraint if rollback
+        Schema::table('contact_infos', function (Blueprint $table) {
+            $table->string('icon')->change(); // Back to default string length
         });
     }
 };

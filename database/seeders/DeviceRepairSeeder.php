@@ -79,7 +79,12 @@ class DeviceRepairSeeder extends Seeder
             $issue = $faker->randomElement($issues);
             $note = $faker->randomElement($notes);
             $status = $faker->randomElement($statuses);
-            $price = $status === 'Selesai' ? $faker->numberBetween(150000, 2000000) : null;
+            // Harga dibulatkan ke bawah kelipatan 1000
+            $price = null;
+            if ($status === 'Selesai') {
+                $rawPrice = $faker->numberBetween(150000, 2000000);
+                $price = floor($rawPrice / 1000) * 1000;
+            }
             $payment_method = $status === 'Selesai' ? $faker->randomElement($payment_methods) : null;
             $transfer_proof = ($payment_method === 'Transfer' && $status === 'Selesai') ? 'bukti_transfer_' . $i . '.jpg' : null;
 

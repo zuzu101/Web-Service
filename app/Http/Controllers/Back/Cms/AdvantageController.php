@@ -186,7 +186,7 @@ class AdvantageController extends Controller
             $request->validate([
                 'order' => 'required|array',
                 'order.*.id' => 'required|integer|exists:advantages,id',
-                'order.*.order_number' => 'required|integer|min:1'
+                'order.*.order_number' => 'nullable|integer|min:1'
             ]);
 
             $success = $this->advantageService->reorder($request->order);

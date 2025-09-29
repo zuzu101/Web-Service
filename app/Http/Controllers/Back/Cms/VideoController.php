@@ -94,9 +94,18 @@ class VideoController extends Controller
 
     public function destroy(Video $video)
     {
-        $this->videoService->delete($video);
-
-        return response()->json(['message' => 'Video deleted successfully.']);
+        try {
+            $this->videoService->delete($video);
+            return response()->json([
+                'success' => true,
+                'message' => 'Video berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus video: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function toggleStatus(Request $request, Video $video)

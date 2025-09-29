@@ -96,9 +96,9 @@
 
                                     <!-- District Field -->
                     <div class="mb-3">
-                        <label for="district_id" class="form-label">Kecamatan (Opsional)</label>
+                        <label for="district_id" class="form-label">Kecamatan</label>
                         <select name="district_id" id="district_id" class="form-control">
-                            <option value="">Pilih Kecamatan... (Opsional)</option>
+                            <option value="">Pilih Kecamatan...</option>
                             @foreach ($districts as $district)
                                 <option value="{{ $district->id }}" {{ old('district_id', $customer->district_id) == $district->id ? 'selected' : '' }}>
                                     {{ $district->name }}
@@ -112,9 +112,9 @@
 
                     <!-- Village Field -->
                     <div class="mb-3">
-                        <label for="village_id" class="form-label">Desa/Kelurahan (Opsional)</label>
+                        <label for="village_id" class="form-label">Desa/Kelurahan </label>
                         <select name="village_id" id="village_id" class="form-control">
-                            <option value="">Pilih Desa/Kelurahan... (Opsional)</option>
+                            <option value="">Pilih Desa/Kelurahan... </option>
                             @foreach ($villages as $village)
                                 <option value="{{ $village->id }}" {{ old('village_id', $customer->village_id) == $village->id ? 'selected' : '' }}>
                                     {{ $village->name }}
@@ -126,7 +126,6 @@
                         @enderror
                     </div>
                     </select>
-                    <small class="form-text text-muted">Opsional - pilih jika ingin lebih detail</small>
                     @error('village_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -198,8 +197,8 @@
             
             // Clear regency, district, and village
             regencySelect.empty().append('<option value="">Pilih Kabupaten/Kota...</option>');
-            districtSelect.empty().append('<option value="">Pilih Kecamatan... (Opsional)</option>').prop('disabled', true);
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>').prop('disabled', true);
+            districtSelect.empty().append('<option value="">Pilih Kecamatan... </option>').prop('disabled', true);
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>').prop('disabled', true);
             
             if (provinceId && regenciesData[provinceId]) {
                 // Populate regencies
@@ -219,8 +218,8 @@
             const villageSelect = $('#village_id');
             
             // Clear districts and villages
-            districtSelect.empty().append('<option value="">Pilih Kecamatan... (Opsional)</option>');
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>').prop('disabled', true);
+            districtSelect.empty().append('<option value="">Pilih Kecamatan... </option>');
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>').prop('disabled', true);
             
             if (regencyId && districtsData[regencyId]) {
                 // Populate districts
@@ -239,7 +238,7 @@
             const villageSelect = $('#village_id');
             
             // Clear villages
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>');
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>');
             
             if (districtId && villagesData[districtId]) {
                 // Populate villages

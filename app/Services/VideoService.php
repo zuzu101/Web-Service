@@ -29,6 +29,13 @@ class VideoService
     public function delete(Video $video)
     {
         try {
+            // Delete thumbnail file if it is a local file (not a YouTube URL)
+            if ($video->thumbnail_url && !preg_match('/^https?:\/\//', $video->thumbnail_url)) {
+                $thumbnailPath = public_path($video->thumbnail_url);
+                if (file_exists($thumbnailPath)) {
+                    @unlink($thumbnailPath);
+                }
+            }
             return $video->delete();
         } catch (Exception $e) {
             throw new Exception('Failed to delete video: ' . $e->getMessage());

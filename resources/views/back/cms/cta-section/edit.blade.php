@@ -114,15 +114,6 @@
                             </small>
                         </div>
 
-                        <!-- Info Box -->
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle"></i> Informasi</h6>
-                            <small>
-                                • Order: {{ $ctaSection->order }}<br>
-                                • Dibuat: {{ $ctaSection->created_at->format('d/m/Y H:i') }}<br>
-                                • Diupdate: {{ $ctaSection->updated_at->format('d/m/Y H:i') }}
-                            </small>
-                        </div>
                     </div>
                 </div>
 

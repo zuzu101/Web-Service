@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
 			StepSeeder::class,
 			TestimonialSeeder::class,
 			VideoSectionSeeder::class,
+			VideoSeeder::class,
 			UserSeeder::class,
 		]);
 	}

@@ -33,23 +33,23 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <label for="title" class="form-label">Judul Video <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                           class="form-control @error('title') is-invalid @enderror" 
-                                           id="title" 
-                                           name="title" 
-                                           value="{{ old('title', $video->title) }}" 
-                                           placeholder="Contoh: Lihat Proses Pengerjaan Teknisi Kami"
-                                           required>
+                     <label for="editVideoTitle" class="form-label">Judul Video <span class="text-danger">*</span></label>
+                     <input type="text" 
+                         class="form-control @error('title') is-invalid @enderror" 
+                         id="editVideoTitle" 
+                         name="title" 
+                         value="{{ old('title', $video->title) }}" 
+                         placeholder="Contoh: Lihat Proses Pengerjaan Teknisi Kami"
+                         required>
                                     @error('title')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label for="description" class="form-label">Deskripsi Video</label>
+                                    <label for="editVideoDescription" class="form-label">Deskripsi Video</label>
                                     <textarea class="form-control @error('description') is-invalid @enderror" 
-                                              id="description" 
+                                              id="editVideoDescription" 
                                               name="description" 
                                               rows="3" 
                                               placeholder="Contoh: Video menunjukkan proses service laptop secara profesional dan transparan">{{ old('description', $video->description) }}</textarea>
@@ -59,14 +59,14 @@
                                 </div>
 
                                 <div class="form-group mb-3">
-                                    <label for="video_url" class="form-label">URL Video YouTube <span class="text-danger">*</span></label>
-                                    <input type="url" 
-                                           class="form-control @error('video_url') is-invalid @enderror" 
-                                           id="video_url" 
-                                           name="video_url" 
-                                           value="{{ old('video_url', $video->video_url) }}" 
-                                           placeholder="https://www.youtube.com/watch?v=VIDEO_ID atau https://youtu.be/VIDEO_ID"
-                                           required>
+                     <label for="editVideoUrl" class="form-label">URL Video YouTube <span class="text-danger">*</span></label>
+                     <input type="url" 
+                         class="form-control @error('video_url') is-invalid @enderror" 
+                         id="editVideoUrl" 
+                         name="video_url" 
+                         value="{{ old('video_url', $video->video_url) }}" 
+                         placeholder="https://www.youtube.com/watch?v=VIDEO_ID atau https://youtu.be/VIDEO_ID"
+                         required>
                                     @error('video_url')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -95,11 +95,11 @@
                                     <div class="form-check">
                                         <input class="form-check-input @error('is_active') is-invalid @enderror" 
                                                type="checkbox" 
-                                               id="is_active" 
+                                               id="editVideoIsActive" 
                                                name="is_active" 
                                                value="1" 
                                                {{ old('is_active', $video->is_active) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_active">
+                                        <label class="form-check-label" for="editVideoIsActive">
                                             Status Aktif
                                         </label>
                                         @error('is_active')

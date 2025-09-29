@@ -133,39 +133,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-6">
-                    <!-- Image 2 -->
-                    <div class="form-group">
-                        <label for="image2">Gambar 2</label>
-                        
-                        @if($hero->image2)
-                            <div class="mb-2">
-                                <p class="text-muted mb-1">Gambar saat ini:</p>
-                                <img src="{{ $hero->image2_url }}" alt="Current Image 2" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                            </div>
-                        @endif
-                        
-                        <div class="custom-file">
-                            <input type="file" 
-                                   class="custom-file-input @error('image2') is-invalid @enderror" 
-                                   id="image2" 
-                                   name="image2" 
-                                   accept="image/*">
-                            <label class="custom-file-label" for="image2">{{ $hero->image2 ? 'Ganti gambar...' : 'Pilih gambar...' }}</label>
-                        </div>
-                        @error('image2')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                        <small class="text-muted">Format: JPEG, PNG, JPG, GIF, WEBP. Maksimal 2MB</small>
-                        
-                        <!-- Image Preview -->
-                        <div id="image2-preview" class="mt-2" style="display: none;">
-                            <p class="text-muted mb-1">Preview gambar baru:</p>
-                            <img id="image2-preview-img" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Submit Button -->

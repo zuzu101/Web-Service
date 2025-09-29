@@ -64,7 +64,7 @@
 
                 {{-- Alamat --}}
                 <div class="form-group">
-                    <label for="province_id">Provinsi <span class="text-danger">*</span></label>
+                    <label for="province_id">Provinsi</label>
                     <select name="province_id" id="province_id" class="form-control select2 @error('province_id') is-invalid @enderror" required>
                         <option value="">Pilih Provinsi...</option>
                         @foreach($provinces as $province)
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="regency_id">Kabupaten/Kota <span class="text-danger">*</span></label>
+                    <label for="regency_id">Kabupaten/Kota</label>
                     <select name="regency_id" id="regency_id" class="form-control select2 @error('regency_id') is-invalid @enderror" required disabled>
                         <option value="">Pilih Kabupaten/Kota...</option>
                     </select>
@@ -91,9 +91,8 @@
                 <div class="form-group">
                     <label for="district_id">Kecamatan</label>
                     <select name="district_id" id="district_id" class="form-control select2 @error('district_id') is-invalid @enderror" disabled>
-                        <option value="">Pilih Kecamatan... (Opsional)</option>
+                        <option value="">Pilih Kecamatan...</option>
                     </select>
-                    <small class="form-text text-muted">Opsional - pilih jika ingin lebih detail</small>
                     @error('district_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -102,9 +101,8 @@
                 <div class="form-group">
                     <label for="village_id">Desa/Kelurahan</label>
                     <select name="village_id" id="village_id" class="form-control select2 @error('village_id') is-invalid @enderror" disabled>
-                        <option value="">Pilih Desa/Kelurahan... (Opsional)</option>
+                        <option value="">Pilih Desa/Kelurahan...</option>
                     </select>
-                    <small class="form-text text-muted">Opsional - pilih jika ingin lebih detail</small>
                     @error('village_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -173,8 +171,8 @@
             
             // Clear regency, district, and village
             regencySelect.empty().append('<option value="">Pilih Kabupaten/Kota...</option>');
-            districtSelect.empty().append('<option value="">Pilih Kecamatan... (Opsional)</option>').prop('disabled', true);
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>').prop('disabled', true);
+            districtSelect.empty().append('<option value="">Pilih Kecamatan... </option>').prop('disabled', true);
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>').prop('disabled', true);
             
             if (provinceId && regenciesData[provinceId]) {
                 // Populate regencies
@@ -194,8 +192,8 @@
             const villageSelect = $('#village_id');
             
             // Clear districts and villages
-            districtSelect.empty().append('<option value="">Pilih Kecamatan... (Opsional)</option>');
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>').prop('disabled', true);
+            districtSelect.empty().append('<option value="">Pilih Kecamatan... </option>');
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>').prop('disabled', true);
             
             if (regencyId && districtsData[regencyId]) {
                 // Populate districts
@@ -214,7 +212,7 @@
             const villageSelect = $('#village_id');
             
             // Clear villages
-            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... (Opsional)</option>');
+            villageSelect.empty().append('<option value="">Pilih Desa/Kelurahan... </option>');
             
             if (districtId && villagesData[districtId]) {
                 // Populate villages

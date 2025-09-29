@@ -37,20 +37,20 @@
                             <form id="quickEditSectionForm">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="sectionTitle" class="form-label fw-bold">Judul Section (Opsional)</label>
-                                    <input type="text" 
-                                           id="sectionTitle" 
-                                           name="title" 
-                                           class="form-control" 
-                                           placeholder="Masukkan judul section video (biarkan kosong jika tidak ingin ditampilkan)...">
+                     <label for="quickEditSectionTitle" class="form-label fw-bold">Judul Section (Opsional)</label>
+                     <input type="text" 
+                         id="quickEditSectionTitle" 
+                         name="title" 
+                         class="form-control" 
+                         placeholder="Masukkan judul section video (biarkan kosong jika tidak ingin ditampilkan)...">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="sectionSubtitle" class="form-label fw-bold">Subtitle Section (Opsional)</label>
-                                    <input type="text" 
-                                           id="sectionSubtitle" 
-                                           name="subtitle" 
-                                           class="form-control" 
-                                           placeholder="Masukkan subtitle section video (biarkan kosong jika tidak ingin ditampilkan)...">
+                     <label for="quickEditSectionSubtitle" class="form-label fw-bold">Subtitle Section (Opsional)</label>
+                     <input type="text" 
+                         id="quickEditSectionSubtitle" 
+                         name="subtitle" 
+                         class="form-control" 
+                         placeholder="Masukkan subtitle section video (biarkan kosong jika tidak ingin ditampilkan)...">
                                 </div>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save"></i> Simpan Perubahan
@@ -102,7 +102,7 @@
 <script src="{{ asset('back_assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('back_assets/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('back_assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('back_assets/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 $(document).ready(function() {
@@ -131,8 +131,8 @@ $(document).ready(function() {
     $('#quickEditSectionForm').on('submit', function(e) {
         e.preventDefault();
         
-        const title = $('#sectionTitle').val().trim();
-        const subtitle = $('#sectionSubtitle').val().trim();
+    const title = $('#quickEditSectionTitle').val().trim();
+    const subtitle = $('#quickEditSectionSubtitle').val().trim();
         
         // Allow both fields to be empty - no validation required
 
@@ -197,21 +197,21 @@ function loadSectionData() {
             if (response.success && response.data) {
                 // Load actual data into input fields
                 if (response.data.title) {
-                    $('#sectionTitle').val(response.data.title);
+                    $('#quickEditSectionTitle').val(response.data.title);
                 }
                 if (response.data.subtitle) {
-                    $('#sectionSubtitle').val(response.data.subtitle);
+                    $('#quickEditSectionSubtitle').val(response.data.subtitle);
                 }
             } else {
                 // If no data exists, leave fields empty with helpful placeholders
-                $('#sectionTitle').attr('placeholder', 'Masukkan judul section video...');
-                $('#sectionSubtitle').attr('placeholder', 'Masukkan subtitle section video...');
+                $('#quickEditSectionTitle').attr('placeholder', 'Masukkan judul section video...');
+                $('#quickEditSectionSubtitle').attr('placeholder', 'Masukkan subtitle section video...');
             }
         },
         error: function() {
             // If error loading data, set default placeholders
-            $('#sectionTitle').attr('placeholder', 'Masukkan judul section video...');
-            $('#sectionSubtitle').attr('placeholder', 'Masukkan subtitle section video...');
+            $('#quickEditSectionTitle').attr('placeholder', 'Masukkan judul section video...');
+            $('#quickEditSectionSubtitle').attr('placeholder', 'Masukkan subtitle section video...');
             console.log('Error loading section data');
         }
     });
@@ -250,7 +250,29 @@ function toggleStatus(id) {
 }
 
 function deleteVideo(id) {
-    Swal.fire({
+    console.log('Delete video called for id:', id);
+    var swalInstance = window.Swal || Swal;
+    if (typeof swalInstance === 'undefined') {
+        if (confirm('Yakin hapus?')) {
+            console.log('Confirmed, sending fetch (fallback confirm)');
+            fetch(`{{ url('admin/cms/video') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Video berhasil dihapus.');
+                $('#videoTable').DataTable().ajax.reload();
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan saat menghapus data.');
+            });
+        }
+        return;
+    }
+    swalInstance.fire({
         title: 'Apakah Anda yakin?',
         text: 'Data yang dihapus tidak dapat dikembalikan!',
         icon: 'warning',
@@ -261,24 +283,37 @@ function deleteVideo(id) {
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
+            console.log('Confirmed, sending fetch');
             fetch(`{{ url('admin/cms/video') }}/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Fetch response:', response);
+                return response.json();
+            })
             .then(data => {
-                Swal.fire({
+                console.log('Fetch data:', data);
+                swalInstance.fire({
                     icon: 'success',
-                    title: 'Terhapus!',
-                    text: 'Video berhasil dihapus.',
-                    timer: 1500,
+                    title: 'Berhasil!',
+                    text: data.message || 'Video berhasil dihapus.',
+                    timer: 2000,
                     showConfirmButton: false
                 });
-                
                 $('#videoTable').DataTable().ajax.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                swalInstance.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menghapus data.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             });
         }
     });

@@ -103,7 +103,7 @@
 <script src="{{ asset('back_assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('back_assets/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('back_assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('back_assets/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 $(document).ready(function() {
@@ -252,7 +252,27 @@ function toggleStatus(id) {
 }
 
 function deletePromo(id) {
-    Swal.fire({
+    var swalInstance = window.Swal || Swal;
+    if (typeof swalInstance === 'undefined') {
+        if (confirm('Yakin hapus?')) {
+            fetch(`{{ url('admin/cms/promo') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Promo berhasil dihapus.');
+                $('#promoTable').DataTable().ajax.reload();
+            })
+            .catch(error => {
+                alert('Terjadi kesalahan saat menghapus data.');
+            });
+        }
+        return;
+    }
+    swalInstance.fire({
         title: 'Apakah Anda yakin?',
         text: 'Data yang dihapus tidak dapat dikembalikan!',
         icon: 'warning',
@@ -266,21 +286,30 @@ function deletePromo(id) {
             fetch(`{{ url('admin/cms/promo') }}/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                return response.json();
+            })
             .then(data => {
-                Swal.fire({
+                swalInstance.fire({
                     icon: 'success',
                     title: 'Terhapus!',
-                    text: 'Promo berhasil dihapus.',
+                    text: data.message || 'Promo berhasil dihapus.',
                     timer: 1500,
                     showConfirmButton: false
                 });
-                
                 $('#promoTable').DataTable().ajax.reload();
+            })
+            .catch(error => {
+                swalInstance.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menghapus data.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             });
         }
     });

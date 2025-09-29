@@ -94,15 +94,6 @@
                             </small>
                         </div>
 
-                        <!-- Info Box -->
-                        <div class="alert alert-info">
-                            <h6><i class="fas fa-info-circle"></i> Informasi</h6>
-                            <small>
-                                • Urutan akan otomatis diatur<br>
-                                • Background image opsional<br>
-                                • Title wajib diisi
-                            </small>
-                        </div>
                     </div>
                 </div>
 
